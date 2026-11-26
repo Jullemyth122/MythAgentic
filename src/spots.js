@@ -6,7 +6,7 @@
 
 import { groupByTemplate } from "./scanner/simhash.js";
 
-const COVERAGE_WORDS = /\b(hmo|insurance|coverage|covered|warranty|returns?|refunds?|shipping|delivery|installments?)\b/i;
+const COVERAGE_WORDS = /\b(hmo|insurance|coverage|covered|warranty|returns?|refunds?|cancel\w*|payments?|shipping|delivery|installments?)\b/i;
 const CONTACT_PAGE = /\b(contact|find us|visit (us|our)|location|directions)\b/i;
 
 /**
@@ -22,6 +22,19 @@ export function purposeOf(text) {
   if (/\b(contact|message|inquir\w*|enquir\w*)\b/.test(t)) return "contact";
   if (/\b(subscribe|newsletter)\b/.test(t)) return "subscribe";
   return "other";
+}
+
+/**
+ * The business's name, from the home page title ("Home · Ngiti Dental Clinic") or host.
+ * @param {{origin:string, pages:Array<{path:string,title:string}>}} crawl
+ */
+export function siteNameOf(crawl) {
+  const home = crawl.pages.find((p) => p.path === "/" || p.path.endsWith("/index.html")) ?? crawl.pages[0];
+  const title = home?.title ?? "";
+  const parts = title.split(/\s+[·|–—-]\s+/).map((t) => t.trim()).filter(Boolean);
+  if (parts.length > 1) return parts.at(-1).slice(0, 60);
+  if (parts[0] && parts[0].length <= 60) return parts[0];
+  return new URL(crawl.origin).hostname.replace(/^www\./, "");
 }
 
 /** Baseline Value for each purpose (the owner can change it). */
@@ -69,6 +82,7 @@ function formSpots(page, form, pages) {
       pages,
       scores: { friction: 3, value: VALUE_FOR_PURPOSE.account, fit: 3, effort: 5, risk: 5 },
       flags: { secrets: true, regulated: page.mentionsHealth },
+      source: { path: page.path },
     });
     spot.signals.push({ id: "password_field", text: "The form asks for a password" });
     if (page.mentionsHealth) spot.signals.push({ id: "health_words", text: "The page mentions health records (records, X-rays, treatment, patients)" });
@@ -104,6 +118,7 @@ function formSpots(page, form, pages) {
     pages,
     scores: { friction, value, fit, effort, risk },
     flags,
+    source: { path: page.path, formIndex: form.index, formId: form.id, title: where, submitText: form.submitText, steps: form.steps, fields: form.fields },
   });
   spot.signals.push({ id: "field_count", text: `${plural(form.fieldCount, "field")}, ${form.requiredCount} required` });
   if (form.steps > 1) spot.signals.push({ id: "steps", text: `${form.steps} steps` });
@@ -129,6 +144,7 @@ function formSpots(page, form, pages) {
       pages,
       needsConnector: true,
       scores: { friction: 3, value: 5, fit: 4, effort: 3, risk: 1 },
+      source: { path: page.path },
     });
     slots.signals.push({ id: "date_time_typed", text: "The visitor types a date and a time" });
     slots.signals.push({ id: "no_slots_shown", text: "No free slots are shown before sending" });
@@ -176,7 +192,7 @@ export function findSpots(crawl) {
 
   // Compare: a table of many similar items that link to pages of one template.
   for (const page of pages) {
-    for (const table of page.tables) {
+    for (const [tableIndex, table] of page.tables.entries()) {
       if (table.rows < 6 || table.cols < 4) continue;
       const targets = page.links.map((l) => groupOf.get(l.url)).filter((g) => g && g.urls.length > 1);
       const template = targets[0];
@@ -187,6 +203,7 @@ export function findSpots(crawl) {
         purpose: "compare",
         pages: [page.url],
         scores: { friction: 4, value: VALUE_FOR_PURPOSE.compare, fit: clamp(table.rows >= 10 ? 5 : 4), effort: 1, risk: 1 },
+        source: { path: page.path, tableIndex, title: page.h1 || page.title, rows: table.rows, cols: table.cols },
       });
       spot.signals.push({ id: "similar_items", text: `${table.rows} similar items in one table` });
       spot.signals.push({ id: "attributes", text: `${table.cols} columns to compare` });
@@ -218,6 +235,7 @@ export function findSpots(crawl) {
       pages: [...group.urls],
       scores: { friction, value: coverage ? 4 : VALUE_FOR_PURPOSE.learn, fit, effort: 1, risk: 1 },
       publicFactsOnly: page.mentionsHealth,
+      source: { path: page.path, title: page.h1 || page.title, questions: page.questions, words: page.words },
     });
     spot.signals.push({ id: "questions", text: `${plural(page.questions, "question")} answered in ${plural(page.words, "word")}` });
     if (coverage) spot.signals.push({ id: "coverage_questions", text: "Questions about coverage, payment or delivery, asked before buying" });
@@ -244,6 +262,7 @@ export function findSpots(crawl) {
       purpose: "price",
       pages: priceless.map((p) => p.url),
       scores: { friction: 4, value: VALUE_FOR_PURPOSE.price, fit: 2, effort: 1, risk: 1 },
+      source: { path: priceless[0].path, mentions },
     });
     spot.signals.push({ id: "price_on_request", text: `"Price on request" ${plural(mentions, "time")} on ${plural(priceless.length, "page")}` });
     spot.signals.push({ id: "no_prices", text: `No prices shown on any of ${plural(pages.length, "page")}` });
@@ -270,6 +289,7 @@ export function findSpots(crawl) {
       purpose: "contact",
       pages: [contact.url],
       scores: { friction: hours ? 1 : 2, value: VALUE_FOR_PURPOSE.contact, fit: 1, effort: 1, risk: 1 },
+      source: { path: contact.path, title: contact.h1 || contact.title },
     });
     if (hours) {
       spot.signals.push({ id: "hours_shown", text: "Opening hours are shown" });

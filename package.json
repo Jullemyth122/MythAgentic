@@ -13,7 +13,8 @@
     "scan": "node scripts/scan-local.mjs",
     "serve:clinic": "node vendor/agentify-website/scripts/serve_site.mjs test-sites/clinic --port 8091",
     "serve:shop": "node vendor/agentify-website/scripts/serve_site.mjs test-sites/shop --port 8092",
-    "serve:clear": "node vendor/agentify-website/scripts/serve_site.mjs test-sites/clear --port 8093"
+    "serve:clear": "node vendor/agentify-website/scripts/serve_site.mjs test-sites/clear --port 8093",
+    "start": "node server/server.mjs"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",

@@ -89,21 +89,25 @@ export function measureForm(doc, form) {
     const name = el.getAttribute("name") ?? el.getAttribute("id") ?? "";
     const label = labelFor(doc, el);
     const required = el.hasAttribute("required") || el.getAttribute("aria-required") === "true";
-    const options = tag === "select" ? [...el.querySelectorAll("option")].filter((o) => o.getAttribute("value") !== "").length : 0;
+    const choices = tag === "select"
+      ? [...el.querySelectorAll("option")].filter((o) => o.getAttribute("value") !== "").map((o) => o.getAttribute("value") ?? textOf(o))
+      : [];
+    const options = choices.length;
     if ((type === "radio" || type === "checkbox") && name) {
       const existing = groups.get(name);
       if (existing) {
         existing.required ||= required;
         existing.options += 1;
+        existing.choices.push(el.getAttribute("value") ?? "on");
         if (!existing.label && label) existing.label = label;
         continue;
       }
-      const field = { name, type, label, required, options: 1 };
+      const field = { name, type, label, required, options: 1, choices: [el.getAttribute("value") ?? "on"] };
       groups.set(name, field);
       fields.push(field);
       continue;
     }
-    fields.push({ name, type, label, required, options });
+    fields.push({ name, type, label, required, options, choices: choices.slice(0, 60), placeholder: el.getAttribute("placeholder") ?? "" });
   }
 
   const legends = [...form.querySelectorAll("legend, h2, h3")].map(textOf);

@@ -14,9 +14,10 @@ For each spot on a site it decides one of:
 
 Every decision shows the measured signals and the rule that produced it.
 
-> Status: early build (Phase 1 of [PLAN.md](PLAN.md)). The scanner, the scoring rules and
-> three test sites work from the command line. The website, the agent network and the pack
-> generator are next.
+> Status: working local build. Scan a sample or any public URL, see the placement map,
+> override, and build an agent pack that passes the official `build_network.mjs --check`.
+> Still to come: the AI classification step, the browser scanner for JavaScript-drawn
+> pages, MythAgentic's own `score_page` network, and hosting.
 
 ## How it decides
 
@@ -36,8 +37,25 @@ Needs Node.js 22 or newer.
 
 ```shell
 npm install
+npm start                         # then open http://localhost:8090
+```
+
+On the website:
+
+1. Pick a sample (clinic, tours, shop or bakery), or paste a public URL you own or may scan.
+2. Click any card to see its evidence, score parts, and the rules that decided it. Change
+   "How important is this task" to see the formula re-run.
+3. Pick the agent spots to build and select **Build agent pack**. The pack is checked with
+   the challenge's own `build_network.mjs --check`.
+4. For a sample, select **Open the agentified site**, add your own AI key in
+   **⚙ AI model settings** (Meta, OpenRouter or Otari), and ask in one sentence.
+   For any other site, download the pack as a ZIP.
+
+Command line:
+
+```shell
 npm test                          # all tests
-npm run scan -- clinic            # scan a test site: clinic, shop or clear
+npm run scan -- clinic            # scan a test site: clinic, tours, shop or clear
 npm run scan -- clinic --json     # the full result
 ```
 
@@ -62,7 +80,10 @@ skips account, cart and checkout pages.
 | `src/score.js` | The formula, the placement rules and the vetoes |
 | `src/spots.js` | Measured pages → spots with 1–5 scores and their evidence |
 | `src/scanner/` | Crawler, robots.txt, sitemap, page measurement, template grouping |
-| `test-sites/` | Three made-up businesses with known problems: clinic, shop, clear |
+| `src/pack/` | Agent pack generator (official templates), generic site actions, ZIP |
+| `server/server.mjs` | Local server: website, `/api/scan`, `/api/pack`, agentified samples |
+| `site/` | The MythAgentic website |
+| `test-sites/` | Four made-up businesses with known problems: clinic, tours, shop, clear |
 | `tests/` | `node --test` tests, including the expected decisions for each test site |
 | `vendor/agentify-website/` | The challenge's official skill and runtime, unchanged |
 

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reserve a tour · Isla Verde Tours</title>
+<link rel="stylesheet" href="style.css">
+<script src="demo-form.js" defer></script>
+</head>
+<body>
+<p class="demo">Demo site made for testing MythAgentic. Isla Verde Tours is a made-up business. Do not enter real personal data.</p>
+<header>
+<strong>Isla Verde Tours</strong>
+<nav><a href="index.html">Home</a><a href="tours.html">Tours</a><a href="reserve.html">Reserve</a><a href="policies.html">Policies &amp; FAQ</a><a href="contact.html">Contact</a></nav>
+</header>
+<main>
+<h1>Reserve a tour</h1>
+<form id="reserve" action="#" method="post">
+<label for="r-tour">Tour</label>
+<select id="r-tour" name="tour" required><option value="">Choose a tour</option><option>Tour A: Lagoons</option><option>Tour B: Caves and sandbars</option><option>Tour C: Hidden beaches</option><option>Tour D: Island beaches</option><option>Sunset cruise</option><option>Private boat (up to 6)</option></select>
+<label for="r-date">Date</label>
+<input id="r-date" name="date" type="date" required>
+<label for="r-guests">Number of guests</label>
+<input id="r-guests" name="guests" type="number" min="1" max="20" required>
+<label for="r-hotel">Hotel for pickup</label>
+<input id="r-hotel" name="hotel" required>
+<label for="r-name">Full name</label>
+<input id="r-name" name="name" required>
+<label for="r-email">Email</label>
+<input id="r-email" name="email" type="email" required>
+<label for="r-phone">Mobile number</label>
+<input id="r-phone" name="phone" type="tel" required>
+<label for="r-notes">Special requests</label>
+<textarea id="r-notes" name="notes"></textarea>
+<button type="submit">Reserve now</button>
+</form>
+<p>Pay in cash at the pier on the day of your tour.</p>
+</main>
+<footer>© 2026 Isla Verde Tours (made up). For testing only.</footer>
+</body>
+</html>

@@ -2,6 +2,16 @@
 
 Newest first.
 
+## 2026-11-27 (later)
+
+- **Pack actions are generic and data-driven**: one `site-actions.js` reads `placement.json` and registers actions per approved spot (fill and send a form, read Q&A, list table rows, read contact). Why: the same module works on any site with plain HTML forms; no site data is copied into instructions.
+- **"Send" is irreversible and uses the template's own confirmation dialog** with the filled values; "fill" is a write the visitor can still change on the page.
+- **The assistant is mounted only on pages with an approved spot**, not every page. Why: the whole pitch is "not a chatbot everywhere".
+- **Action schemas use only the runtime's subset** (no `pattern`; formats `date` and `email` only). A test registers every sample's actions through the runtime's own `checkSchema`.
+- **Local server instead of Vercel for now**, so the developer can try everything on their machine. Public URL scans refuse private and local addresses and need the permission box.
+- **Fourth sample, Isla Verde Tours**, so three samples get agent packs and the bakery shows "no agent".
+- **UI**: a Pinterest-style gallery (masonry cards with drawn covers sized from the scan) and a Behance-style detail view, light and dark.
+
 ## 2026-11-27
 
 - **MythAgentic replaces Dialect** as our entry for the Open Agentic Web Challenge (developer's decision).

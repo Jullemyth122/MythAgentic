@@ -148,4 +148,5 @@ If late, cut in this order: analytics import → logged-in bookmarklet → backg
 ## 10. Progress
 
 - **27 Nov:** project set up; official skill vendored (commit `0c0ca45`); scoring rules and vetoes (`src/score.js`); three test sites; tier-1 scanner (robots, sitemap, crawl, page signals, template grouping); rule-based spot scores (`src/spots.js`); 18 tests pass. The clinic test site reproduces the .docx placement map.
-- **Next:** the advisor website (paste URL → map → evidence → override), `/api/scan` on Vercel, the advisor's own network and manifest, then the LLM classification step.
+- **27 Nov (later):** the website (gallery of spot cards, detail view with evidence, rules and a Value override, build bar), local server (`npm start`, port 8090) with `/api/scan` for samples and public URLs and `/api/pack`; agent pack generator from the official templates with a generic actions module (`fill_*`, `send_*` with the official confirmation dialog, `read_*`, `list_*_options`, `read_contact`); fourth sample (Isla Verde Tours). Clinic, shop and tours packs pass `build_network.mjs --check`, and the runtime boots on each agentified sample. 23 tests pass.
+- **Next (old list, partly done):** the advisor website (paste URL → map → evidence → override), `/api/scan` on Vercel, the advisor's own network and manifest, then the LLM classification step.

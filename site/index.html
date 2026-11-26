@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MythAgentic · Where AI belongs on your website</title>
+<meta name="description" content="MythAgentic scans a website task by task and shows where an AI agent pays off, what kind, and where none should go. Then it builds only those agents.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+<script type="module" src="app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#" data-go="home" aria-label="MythAgentic home">
+    <img src="favicon.svg" alt="" width="32" height="32">
+    <span>MythAgentic</span>
+  </a>
+  <nav class="topnav" aria-label="Main">
+    <a href="#" data-go="home" class="pill-link">Scan</a>
+    <a href="#samples" class="pill-link">Samples</a>
+    <a href="#how" class="pill-link">How it works</a>
+  </nav>
+  <button class="icon-btn" id="theme" type="button" aria-label="Switch light and dark">◐</button>
+</header>
+
+<main id="app">
+  <section id="home">
+    <div class="hero">
+      <p class="eyebrow">Don't put a chatbot everywhere</p>
+      <h1>Find where AI actually helps on your website</h1>
+      <p class="lede">Paste a URL. MythAgentic checks every page and every task, then shows where an agent pays off, what kind, and where none should go. It builds only those.</p>
+      <form id="scan-form" class="searchbar" autocomplete="off">
+        <label class="visually-hidden" for="url">Website URL</label>
+        <input id="url" name="url" type="url" placeholder="https://your-business.com" required>
+        <button type="submit" class="btn primary">Scan site</button>
+      </form>
+      <label class="permission"><input type="checkbox" id="permission"> I own this site or have permission to scan it. The scanner respects robots.txt and never logs in or sends forms.</label>
+      <p id="scan-error" class="error" role="alert" hidden></p>
+    </div>
+
+    <div class="section-head" id="samples">
+      <h2>Try a sample site</h2>
+      <p>Four made-up businesses, each with known problems. One of them needs no agent at all.</p>
+    </div>
+    <div id="sample-grid" class="masonry"></div>
+
+    <section class="how" id="how">
+      <div class="section-head">
+        <h2>How it decides</h2>
+        <p>Code measures the page. The AI only sorts and explains. A fixed formula ranks every spot, so the same site always gets the same answer.</p>
+      </div>
+      <div class="how-grid">
+        <article class="how-card"><span class="step">1</span><h3>Measure</h3><p>Fields, steps, unlabelled inputs, "price on request", missing opening hours, long FAQs and login pages, all counted by code.</p></article>
+        <article class="how-card"><span class="step">2</span><h3>Score</h3><p class="formula">Priority = <span>Friction × Value × Fit</span> ÷ <span>Effort × Risk</span></p><p>Each part is 1 to 5. An agent needs Priority 20 or more and Fit 3 or more.</p></article>
+        <article class="how-card"><span class="step">3</span><h3>Decide</h3><p>Add an agent, plan it next, fix the page instead, or leave it alone. Payments, health data, ID numbers and children's services go through safety vetoes.</p></article>
+        <article class="how-card"><span class="step">4</span><h3>Build</h3><p>You approve the spots. MythAgentic writes the agent network, manifest and actions in the Open Agentic Web format and checks them with the official validator.</p></article>
+      </div>
+    </section>
+  </section>
+
+  <section id="results" hidden></section>
+</main>
+
+<div id="buildbar" class="buildbar" hidden></div>
+<dialog id="sheet" class="sheet" aria-labelledby="sheet-title"></dialog>
+<dialog id="packsheet" class="sheet narrow" aria-labelledby="pack-title"></dialog>
+
+<footer class="footer">
+  <p>MythAgentic, an entry for the Open Agentic Web Challenge. Open source (MIT). The sample businesses are made up.</p>
+</footer>
+</body>
+</html>
