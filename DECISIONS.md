@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-11-27 (UI redesign)
+
+- **UI follows the developer's own portfolio design system** (C:\Full Stack Production\portfolio_automation): zinc neutrals, hairline borders, glass cards with inset shadows, 8px buttons, uppercase section tags, a split hero with a workflow canvas on a dot grid, metric strips. The developer said the first UI was not good enough.
+- **Inter only**, upright for text and italic for the accent words (developer's request), loaded from Google Fonts with both axes. No serif, no mono.
+- Card covers draw with CSS classes, so they follow the decision colour and light or dark theme.
+
 ## 2026-11-27 (later)
 
 - **Pack actions are generic and data-driven**: one `site-actions.js` reads `placement.json` and registers actions per approved spot (fill and send a form, read Q&A, list table rows, read contact). Why: the same module works on any site with plain HTML forms; no site data is copied into instructions.

@@ -6,54 +6,144 @@
 <title>MythAgentic · Where AI belongs on your website</title>
 <meta name="description" content="MythAgentic scans a website task by task and shows where an AI agent pays off, what kind, and where none should go. Then it builds only those agents.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300..800;1,14..32,300..800&display=swap">
 <link rel="stylesheet" href="style.css">
+<script>
+  try { const t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch {}
+</script>
 <script type="module" src="app.js"></script>
 </head>
 <body>
-<header class="topbar">
-  <a class="brand" href="#" data-go="home" aria-label="MythAgentic home">
-    <img src="favicon.svg" alt="" width="32" height="32">
-    <span>MythAgentic</span>
-  </a>
-  <nav class="topnav" aria-label="Main">
-    <a href="#" data-go="home" class="pill-link">Scan</a>
-    <a href="#samples" class="pill-link">Samples</a>
-    <a href="#how" class="pill-link">How it works</a>
-  </nav>
-  <button class="icon-btn" id="theme" type="button" aria-label="Switch light and dark">◐</button>
+<header class="nav">
+  <div class="nav__inner">
+    <a class="brand" href="#" data-go="home" aria-label="MythAgentic home">
+      <img class="brand__logo" src="favicon.svg" alt="" width="30" height="30">
+      <span class="brand__name">MythAgentic</span>
+      <span class="brand__role">Agent placement advisor</span>
+    </a>
+    <nav class="nav__tabs" aria-label="Main">
+      <a href="#" data-go="home" class="nav-tab">Scan</a>
+      <a href="#samples" class="nav-tab">Samples</a>
+      <a href="#method" class="nav-tab">Method</a>
+    </nav>
+    <div class="nav__actions">
+      <a class="btn btn-secondary btn-sm nav__repo" href="https://github.com/Jullemyth122/MythAgentic" target="_blank" rel="noopener">GitHub ↗</a>
+      <button class="theme-btn" id="theme" type="button" aria-label="Switch light and dark">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z"/></svg>
+      </button>
+    </div>
+  </div>
 </header>
 
-<main id="app">
+<main id="app" class="wrap">
   <section id="home">
     <div class="hero">
-      <p class="eyebrow">Don't put a chatbot everywhere</p>
-      <h1>Find where AI actually helps on your website</h1>
-      <p class="lede">Paste a URL. MythAgentic checks every page and every task, then shows where an agent pays off, what kind, and where none should go. It builds only those.</p>
-      <form id="scan-form" class="searchbar" autocomplete="off">
-        <label class="visually-hidden" for="url">Website URL</label>
-        <input id="url" name="url" type="url" placeholder="https://your-business.com" required>
-        <button type="submit" class="btn primary">Scan site</button>
-      </form>
-      <label class="permission"><input type="checkbox" id="permission"> I own this site or have permission to scan it. The scanner respects robots.txt and never logs in or sends forms.</label>
-      <p id="scan-error" class="error" role="alert" hidden></p>
-    </div>
-
-    <div class="section-head" id="samples">
-      <h2>Try a sample site</h2>
-      <p>Four made-up businesses, each with known problems. One of them needs no agent at all.</p>
-    </div>
-    <div id="sample-grid" class="masonry"></div>
-
-    <section class="how" id="how">
-      <div class="section-head">
-        <h2>How it decides</h2>
-        <p>Code measures the page. The AI only sorts and explains. A fixed formula ranks every spot, so the same site always gets the same answer.</p>
+      <div class="hero__copy">
+        <span class="status-pill"><span class="pulse-dot"></span>Open Agentic Web Challenge · 2026</span>
+        <h1 class="hero__title">Don't put a chatbot <em class="accent">everywhere.</em></h1>
+        <p class="hero__intro">Paste a URL. MythAgentic reads every page and every task, then shows where an AI agent pays off, what kind, and where none should go. It builds only those, in the official agentic-web format.</p>
+        <form id="scan-form" class="scan" autocomplete="off">
+          <label class="visually-hidden" for="url">Website URL</label>
+          <svg class="scan__icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+          <input id="url" name="url" type="url" placeholder="https://your-business.com" required>
+          <button type="submit" class="btn btn-primary">Scan site</button>
+        </form>
+        <label class="permission"><input type="checkbox" id="permission"> <span>I own this site or may scan it. The scanner respects robots.txt, never logs in and never sends a form.</span></label>
+        <p id="scan-error" class="error" role="alert" hidden></p>
+        <ul class="hero__stats">
+          <li><strong>5</strong><span>Score parts</span></li>
+          <li><strong>10</strong><span>Written rules</span></li>
+          <li><strong>4</strong><span>Safety vetoes</span></li>
+          <li><strong>0</strong><span>Numbers from AI</span></li>
+        </ul>
       </div>
-      <div class="how-grid">
-        <article class="how-card"><span class="step">1</span><h3>Measure</h3><p>Fields, steps, unlabelled inputs, "price on request", missing opening hours, long FAQs and login pages, all counted by code.</p></article>
-        <article class="how-card"><span class="step">2</span><h3>Score</h3><p class="formula">Priority = <span>Friction × Value × Fit</span> ÷ <span>Effort × Risk</span></p><p>Each part is 1 to 5. An agent needs Priority 20 or more and Fit 3 or more.</p></article>
-        <article class="how-card"><span class="step">3</span><h3>Decide</h3><p>Add an agent, plan it next, fix the page instead, or leave it alone. Payments, health data, ID numbers and children's services go through safety vetoes.</p></article>
-        <article class="how-card"><span class="step">4</span><h3>Build</h3><p>You approve the spots. MythAgentic writes the agent network, manifest and actions in the Open Agentic Web format and checks them with the official validator.</p></article>
+
+      <figure class="flow-window hero__canvas" aria-label="Example placement map for the sample dental clinic">
+        <div class="flow-window__bar">
+          <span class="dots"><i></i><i></i><i></i></span>
+          <span class="flow-window__path">ngiti-dental.sample<span> / placement map</span></span>
+          <span class="chip">6 spots</span>
+        </div>
+        <svg class="flow" viewBox="0 0 560 400" role="img" aria-hidden="true">
+          <defs>
+            <pattern id="dotgrid" width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="1.2" cy="1.2" r="1.2" class="flow__dot"/></pattern>
+          </defs>
+          <rect width="560" height="400" fill="url(#dotgrid)"/>
+          <g class="flow__edges">
+            <path d="M150 200 C 220 200, 220 52, 290 52" class="edge e-agent"/>
+            <path d="M150 200 C 220 200, 220 124, 290 124" class="edge e-agent"/>
+            <path d="M150 200 C 220 200, 220 196, 290 196" class="edge e-plan"/>
+            <path d="M150 200 C 220 200, 220 268, 290 268" class="edge e-fix"/>
+            <path d="M150 200 C 220 200, 220 340, 290 340" class="edge e-veto"/>
+          </g>
+          <g class="node node--root" transform="translate(24 172)">
+            <rect width="126" height="56" rx="12"/>
+            <text x="16" y="25" class="n-title">Home</text>
+            <text x="16" y="42" class="n-sub">6 pages read</text>
+          </g>
+          <g class="node t-agent" transform="translate(290 24)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Booking form</text><text x="32" y="42" class="n-sub">Inline form helper</text><text x="226" y="34" class="n-num" text-anchor="end">63</text></g>
+          <g class="node t-agent" transform="translate(290 96)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">HMO questions</text><text x="32" y="42" class="n-sub">Answer desk</text><text x="226" y="34" class="n-num" text-anchor="end">48</text></g>
+          <g class="node t-plan" transform="translate(290 168)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">check_slots</text><text x="32" y="42" class="n-sub">Plan next · needs schedule</text><text x="226" y="34" class="n-num" text-anchor="end">20</text></g>
+          <g class="node t-fix" transform="translate(290 240)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Price on request</text><text x="32" y="42" class="n-sub">No agent · publish prices</text><text x="226" y="34" class="n-num" text-anchor="end">16</text></g>
+          <g class="node t-veto" transform="translate(290 312)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Patient portal</text><text x="32" y="42" class="n-sub">Health veto · a person</text><text x="226" y="34" class="n-num" text-anchor="end">1</text></g>
+        </svg>
+        <figcaption class="flow-window__legend">
+          <span><i class="lg t-agent"></i>Agent</span><span><i class="lg t-plan"></i>Plan next</span><span><i class="lg t-fix"></i>Fix the page</span><span><i class="lg t-veto"></i>Veto</span>
+        </figcaption>
+      </figure>
+    </div>
+
+    <section class="section" id="samples">
+      <div class="section-header section-header--split">
+        <div>
+          <span class="section-tag">01 — Samples</span>
+          <h2>Four made-up businesses. <em class="accent">One needs no AI.</em></h2>
+        </div>
+        <p class="section-subtitle">Each sample has known problems built in. Scan one to see the placement map, then build its agent pack.</p>
+      </div>
+      <div id="sample-grid" class="samples"></div>
+    </section>
+
+    <section class="section" id="method">
+      <div class="section-header section-header--split">
+        <div>
+          <span class="section-tag">02 — Method</span>
+          <h2>Code measures. AI explains. <em class="accent">A formula decides.</em></h2>
+        </div>
+        <p class="section-subtitle">The same site always gets the same answer. Every decision shows the signals that were measured and the rule that fired.</p>
+      </div>
+      <div class="method">
+        <div class="panel formula">
+          <span class="panel__tag">Priority</span>
+          <div class="fraction">
+            <div class="fraction__top"><span>Friction</span><b>×</b><span>Value</span><b>×</b><span>Fit</span></div>
+            <div class="fraction__bar"></div>
+            <div class="fraction__bottom"><span>Effort</span><b>×</b><span>Risk</span></div>
+          </div>
+          <p>Each part is 1 to 5, so Priority runs from under 1 to <strong>125</strong>. An agent needs <strong>20 or more</strong> and a Fit of <strong>3 or more</strong>. Anything else gets a page fix, or nothing at all.</p>
+        </div>
+        <div class="panel outcomes">
+          <span class="panel__tag">Five outcomes</span>
+          <ul>
+            <li><i class="lg t-agent"></i><div><b>Add an agent</b><span>Form helper, answer desk, compare helper or an action other agents can call.</span></div></li>
+            <li><i class="lg t-plan"></i><div><b>Plan next</b><span>Worth it, but the data lives in the business's own system first.</span></div></li>
+            <li><i class="lg t-fix"></i><div><b>Fix the page</b><span>Publish the price, add the hours. Cheaper than any AI.</span></div></li>
+            <li><i class="lg t-fine"></i><div><b>Fine as is</b><span>Nothing to do. Saying so builds trust.</span></div></li>
+            <li><i class="lg t-veto"></i><div><b>Safety veto</b><span>Payments, health data, ID numbers, children. Whatever the score.</span></div></li>
+          </ul>
+        </div>
+        <div class="panel steps">
+          <span class="panel__tag">Pipeline</span>
+          <ol>
+            <li><b>Measure</b><span>Fields, steps, missing labels, "price on request", hours, FAQs and logins, counted by code.</span></li>
+            <li><b>Score</b><span>Five parts, each with the reason it got its number.</span></li>
+            <li><b>Decide</b><span>Six placement rules and four vetoes, cited on every card.</span></li>
+            <li><b>Build</b><span>Network, manifest and actions for approved spots, checked by the official validator.</span></li>
+          </ol>
+        </div>
       </div>
     </section>
   </section>
@@ -63,10 +153,13 @@
 
 <div id="buildbar" class="buildbar" hidden></div>
 <dialog id="sheet" class="sheet" aria-labelledby="sheet-title"></dialog>
-<dialog id="packsheet" class="sheet narrow" aria-labelledby="pack-title"></dialog>
+<dialog id="packsheet" class="sheet sheet--narrow" aria-labelledby="pack-title"></dialog>
 
 <footer class="footer">
-  <p>MythAgentic, an entry for the Open Agentic Web Challenge. Open source (MIT). The sample businesses are made up.</p>
+  <div class="wrap footer__inner">
+    <span>MythAgentic — an entry for the Open Agentic Web Challenge.</span>
+    <span>Open source, MIT. The sample businesses are <em>made up</em>.</span>
+  </div>
 </footer>
 </body>
 </html>
