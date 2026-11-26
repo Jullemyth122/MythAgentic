@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Request a quote · Narra &amp; Co. Furniture</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<p class="demo">Demo site made for testing MythAgentic. Narra &amp; Co. Furniture is a made-up business. Do not enter real personal data.</p>
+<header>
+<strong>Narra &amp; Co. Furniture</strong>
+<nav><a href="index.html">Home</a><a href="catalog.html">Sofas</a><a href="quote.html">Request a quote</a><a href="contact.html">Contact</a></nav>
+</header>
+<main>
+<h1>Request a quote</h1>
+<form action="#" method="post">
+<label for="q-sofa">Sofa model</label>
+<select id="q-sofa" name="sofa" required><option value="">Choose a sofa</option><option>Bayani 2-seater</option><option>Bayani 3-seater</option><option>Dalisay 3-seater</option><option>Dalisay L-shape</option><option>Habagat sofa bed</option><option>Liwayway loveseat</option><option>Tala modular 4</option><option>Tala modular 6</option></select>
+<label for="q-fabric">Fabric</label>
+<select id="q-fabric" name="fabric" required><option value="">Choose a fabric</option><option>Linen blend</option><option>Cotton canvas</option><option>Performance fabric</option><option>Velvet</option></select>
+<label for="q-color">Colour</label>
+<input id="q-color" name="color">
+<label for="q-room">Room width (cm)</label>
+<input id="q-room" name="room_width" type="number">
+<label for="q-name">Name</label>
+<input id="q-name" name="name" required>
+<label for="q-email">Email</label>
+<input id="q-email" name="email" type="email" required>
+<label for="q-city">City for delivery</label>
+<input id="q-city" name="city" required>
+<label for="q-notes">Notes</label>
+<textarea id="q-notes" name="notes"></textarea>
+<button type="submit">Send quote request</button>
+</form>
+<p>We reply within two working days.</p>
+</main>
+<footer>© 2026 Narra &amp; Co. Furniture (made up). For testing only.</footer>
+</body>
+</html>

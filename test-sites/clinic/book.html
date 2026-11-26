@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Book a visit · Ngiti Dental Clinic</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<p class="demo">Demo site made for testing MythAgentic. Ngiti Dental Clinic is a made-up business. Do not enter real personal data.</p>
+<header>
+<strong>Ngiti Dental Clinic</strong>
+<nav><a href="index.html">Home</a><a href="services.html">Services</a><a href="book.html">Book a visit</a><a href="faq.html">HMO &amp; FAQ</a><a href="contact.html">Contact</a><a href="portal/login.html">Patient portal</a></nav>
+</header>
+<main>
+<h1>Book a visit</h1>
+<form id="booking" action="#" method="post">
+<fieldset data-step="1">
+<legend>Step 1 of 3: Your visit</legend>
+<label for="service">Service</label>
+<select id="service" name="service" required>
+<option value="">Choose a service</option>
+<option>Check-up and consultation</option><option>Oral prophylaxis (cleaning)</option><option>Tooth filling</option><option>Tooth extraction</option><option>Root canal treatment</option><option>Braces adjustment</option><option>Braces consultation</option><option>Teeth whitening</option><option>Dentures</option><option>Dental X-ray</option><option>Gum treatment</option><option>Pediatric check-up</option>
+</select>
+<label for="branch">Branch</label>
+<select id="branch" name="branch" required><option value="">Choose a branch</option><option>Quezon City</option><option>Makati</option></select>
+<label for="dentist">Dentist</label>
+<select id="dentist" name="dentist"><option value="">Any dentist</option><option>Dr. A. Reyes (made up)</option><option>Dr. B. Santos (made up)</option><option>Dr. C. Lim (made up)</option></select>
+<label for="date">Preferred date</label>
+<input id="date" name="date" type="date" required>
+<label for="time">Preferred time</label>
+<select id="time" name="time" required><option value="">Choose a time</option><option>9:00</option><option>10:00</option><option>11:00</option><option>13:00</option><option>14:00</option><option>15:00</option><option>16:00</option></select>
+</fieldset>
+<fieldset data-step="2">
+<legend>Step 2 of 3: About you</legend>
+<label for="first">First name</label>
+<input id="first" name="first_name" required>
+<label for="last">Last name</label>
+<input id="last" name="last_name" required>
+<label for="phone">Mobile number</label>
+<input id="phone" name="phone" type="tel" required>
+<label for="email">Email</label>
+<input id="email" name="email" type="email" required>
+<p>New patient?</p>
+<input type="radio" name="new_patient" value="yes" required> Yes
+<input type="radio" name="new_patient" value="no"> No
+</fieldset>
+<fieldset data-step="3">
+<legend>Step 3 of 3: Anything else</legend>
+<textarea name="notes" placeholder="Tell us about any pain or concerns"></textarea>
+<select name="heard_from"><option value="">How did you hear about us?</option><option>Facebook</option><option>Friend</option><option>Google</option><option>Walk-in</option></select>
+</fieldset>
+<button type="submit">Request booking</button>
+</form>
+</main>
+<footer>© 2026 Ngiti Dental Clinic (made up). For testing only.</footer>
+</body>
+</html>
