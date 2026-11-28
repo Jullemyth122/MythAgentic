@@ -153,8 +153,108 @@ test("shop: compare helper and quote helper; publish the prices", async () => {
   assert.equal(plan[2].spot.pages.length, 9, "catalog plus 8 product pages");
 });
 
+test("staff handbooks: build cards, the Q&A and the request form get an agent; the call list is fine", async () => {
+  const want = {
+    cafe: [["compare:/drinks.html", "agent", "compare_helper"], ["answers:/food-safety.html", "agent", "answer_desk"], ["form:/shift-swap.html#swap", "agent", "inline_form_helper"], ["contact:/contact.html", "fine", "none"]],
+    warehouse: [["compare:/codes.html", "agent", "compare_helper"], ["answers:/safety.html", "agent", "answer_desk"], ["form:/damage-report.html#damage", "agent", "inline_form_helper"], ["contact:/contact.html", "fine", "none"]],
+  };
+  for (const [name, decided] of Object.entries(want)) {
+    const { plan } = await scan(name);
+    assert.deepEqual(decisions(plan), decided, name);
+  }
+});
+
+test("call center handbook: the payroll form with Social Security and tax ID numbers is vetoed (V3)", async () => {
+  const { plan } = await scan("callcenter");
+  assert.deepEqual(decisions(plan), [
+    ["compare:/escalation.html", "agent", "compare_helper"],
+    ["answers:/call-handling.html", "agent", "answer_desk"],
+    ["form:/leave.html#leave", "agent", "inline_form_helper"],
+    ["form:/payroll.html#payroll", "veto", "human_handoff"],
+    ["contact:/contact.html", "fine", "none"],
+  ]);
+  const payroll = plan[3];
+  assert.ok(payroll.rules.includes("V3"));
+  assert.equal(payroll.spot.scores.risk, 5);
+});
+
+test("social video app: the agent prepares moderation decisions, the real console stays behind a password, teen consent gets no agent (V4)", async () => {
+  const { plan } = await scan("social");
+  assert.deepEqual(decisions(plan), [
+    ["compare:/rules.html", "agent", "compare_helper"],
+    ["answers:/guidelines.html", "agent", "answer_desk"],
+    ["form:/moderators/queue.html#decision", "agent", "inline_form_helper"],
+    ["form:/report.html#report", "plan_next", "inline_form_helper"],
+    ["form:/appeal.html#appeal", "fine", "none"],
+    ["form:/teens.html#consent", "veto", "none"],
+    ["contact:/contact.html", "fine", "none"],
+    ["login:/moderators/console.html", "veto", "human_handoff"],
+  ]);
+  const teens = plan.find((d) => d.spot.id === "form:/teens.html#consent");
+  assert.ok(teens.rules.includes("V4"), "a form on a page for minors gets no agent");
+  assert.ok(teens.spot.signals.some((s) => s.id === "minors_words"));
+  assert.ok(plan.find((d) => d.spot.id.startsWith("login:")).rules.includes("V3"), "the console that removes clips is behind a password");
+  assert.ok(plan.find((d) => d.spot.id === "form:/report.html#report").rules.includes("R3"), "a small site's first plan has at most 3 agent spots");
+});
+
 test("clear site: no agent anywhere", async () => {
   const { plan } = await scan("clear");
   assert.ok(plan.length > 0);
   for (const d of plan) assert.equal(d.decision, "fine", d.spot.id);
+});
+
+/** Crawls a made-up site held in memory. */
+async function scanFiles(files) {
+  const origin = "https://mem.test";
+  const fetcher = async (url) => {
+    const p = new URL(url).pathname;
+    return p in files ? { status: 200, contentType: "text/html", text: `<!doctype html><html><body>${files[p]}</body></html>` } : { status: 404, contentType: "", text: "" };
+  };
+  const crawl = await crawlSite(`${origin}/`, { fetcher, parse });
+  return findSpots(crawl);
+}
+
+test("answers: one answer desk for the whole site, and long pages with no questions are not one", async () => {
+  const words = (n) => `<p>${"lorem ".repeat(n)}</p>`;
+  const qs = (n, topic) => Array.from({ length: n }, (_, i) => `<h3>How does ${topic} ${i} work?</h3><p>It works.</p>`).join("");
+  const files = {
+    "/": `<h1>Home</h1><a href="/guide-a.html">a</a><a href="/guide-b.html">b</a><a href="/help.html">h</a><a href="/blog.html">x</a>${words(50)}`,
+    "/guide-a.html": `<h1>Guide A</h1>${words(900)}`,
+    "/guide-b.html": `<h1>Guide B</h1>${qs(1, "b")}${words(700)}`,
+    "/help.html": `<h1>Help</h1>${qs(6, "help")}`,
+    "/blog.html": `<h1>Blog</h1>${qs(3, "blog")}${words(650)}`,
+  };
+  const { spots } = await scanFiles(files);
+  const answers = spots.filter((s) => s.kind === "answers");
+  assert.equal(answers.length, 1, "one answer desk, not one per page");
+  const desk = answers[0];
+  assert.equal(desk.id, "answers:/help.html", "named after the page with the most questions");
+  assert.deepEqual(desk.source.pages.map((p) => p.path), ["/help.html", "/blog.html"], "pages with no or one question are left out");
+  assert.equal(desk.source.questions, 9, "questions on every page it covers");
+  assert.ok(desk.signals.some((s) => s.id === "more_pages"));
+});
+
+test("every spot says where it is on the page", async () => {
+  for (const name of ["clinic", "shop", "tours"]) {
+    const { spots } = await scan(name);
+    for (const s of spots) {
+      assert.ok(s.target?.path?.startsWith("/"), `${name} ${s.id} has a page`);
+      assert.ok(["form", "table", "question", "price", "page"].includes(s.target.find), `${name} ${s.id} has a find kind`);
+    }
+  }
+  const { spots } = await scan("clinic");
+  assert.deepEqual(spots.find((s) => s.id === "form:/book.html#booking").target, { path: "/book.html", find: "form", index: 1 });
+  assert.deepEqual(spots.find((s) => s.id === "prices").target.find, "price");
+});
+
+test("compare: a table of facts with no links or prices is not a choice", async () => {
+  const row = (i, link) => `<tr><td>${link ? `<a href="/item-${i}.html">Item ${i}</a>` : `Item ${i}`}</td><td>a</td><td>b</td><td>c</td></tr>`;
+  const table = (link) => `<table><tr><th>Name</th><th>A</th><th>B</th><th>C</th></tr>${Array.from({ length: 8 }, (_, i) => row(i, link)).join("")}</table>`;
+  const files = {
+    "/": '<h1>Home</h1><a href="/privacy.html">p</a><a href="/items.html">i</a>',
+    "/privacy.html": `<h1>Privacy</h1>${table(false)}`,
+    "/items.html": `<h1>Items</h1>${table(true)}`,
+  };
+  const { spots } = await scanFiles(files);
+  assert.deepEqual(spots.filter((s) => s.kind === "compare").map((s) => s.id), ["compare:/items.html"]);
 });

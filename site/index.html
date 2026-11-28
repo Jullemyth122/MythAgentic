@@ -29,6 +29,7 @@
       <a href="#method" class="nav-tab">Method</a>
     </nav>
     <div class="nav__actions">
+      <button class="btn btn-secondary btn-sm key-btn" id="key-btn" type="button" data-key><span class="key-dot" id="key-dot"></span><span id="key-label">AI key</span></button>
       <a class="btn btn-secondary btn-sm nav__repo" href="https://github.com/Jullemyth122/MythAgentic" target="_blank" rel="noopener">GitHub ↗</a>
       <button class="theme-btn" id="theme" type="button" aria-label="Switch light and dark">
         <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
@@ -64,7 +65,7 @@
       <figure class="flow-window hero__canvas" aria-label="Example placement map for the sample dental clinic">
         <div class="flow-window__bar">
           <span class="dots"><i></i><i></i><i></i></span>
-          <span class="flow-window__path">ngiti-dental.sample<span> / placement map</span></span>
+          <span class="flow-window__path">brightside-dental.sample<span> / placement map</span></span>
           <span class="chip">6 spots</span>
         </div>
         <svg class="flow" viewBox="0 0 560 400" role="img" aria-hidden="true">
@@ -85,7 +86,7 @@
             <text x="16" y="42" class="n-sub">6 pages read</text>
           </g>
           <g class="node t-agent" transform="translate(290 24)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Booking form</text><text x="32" y="42" class="n-sub">Inline form helper</text><text x="226" y="34" class="n-num" text-anchor="end">63</text></g>
-          <g class="node t-agent" transform="translate(290 96)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">HMO questions</text><text x="32" y="42" class="n-sub">Answer desk</text><text x="226" y="34" class="n-num" text-anchor="end">48</text></g>
+          <g class="node t-agent" transform="translate(290 96)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Insurance questions</text><text x="32" y="42" class="n-sub">Answer desk</text><text x="226" y="34" class="n-num" text-anchor="end">48</text></g>
           <g class="node t-plan" transform="translate(290 168)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">check_slots</text><text x="32" y="42" class="n-sub">Plan next · needs schedule</text><text x="226" y="34" class="n-num" text-anchor="end">20</text></g>
           <g class="node t-fix" transform="translate(290 240)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Price on request</text><text x="32" y="42" class="n-sub">No agent · publish prices</text><text x="226" y="34" class="n-num" text-anchor="end">16</text></g>
           <g class="node t-veto" transform="translate(290 312)"><rect width="246" height="56" rx="12"/><circle cx="18" cy="28" r="5"/><text x="32" y="25" class="n-title">Patient portal</text><text x="32" y="42" class="n-sub">Health veto · a person</text><text x="226" y="34" class="n-num" text-anchor="end">1</text></g>
@@ -100,9 +101,9 @@
       <div class="section-header section-header--split">
         <div>
           <span class="section-tag">01 — Samples</span>
-          <h2>Four made-up businesses. <em class="accent">One needs no AI.</em></h2>
+          <h2>Eight made-up businesses. <em class="accent">One needs no AI.</em></h2>
         </div>
-        <p class="section-subtitle">Each sample has known problems built in. Scan one to see the placement map, then build its agent pack.</p>
+        <p class="section-subtitle">Four customer websites, a social video app with content moderation, and three staff handbooks where new employees learn the job: a coffee shop, a logistics warehouse and a call center. Scan one to see the placement map, then build its agent pack.</p>
       </div>
       <div id="sample-grid" class="samples"></div>
     </section>
@@ -154,6 +155,9 @@
 <div id="buildbar" class="buildbar" hidden></div>
 <dialog id="sheet" class="sheet" aria-labelledby="sheet-title"></dialog>
 <dialog id="packsheet" class="sheet sheet--narrow" aria-labelledby="pack-title"></dialog>
+<dialog id="keysheet" class="sheet sheet--narrow" aria-labelledby="key-title"></dialog>
+<dialog id="pagesheet" class="sheet" aria-labelledby="page-title"></dialog>
+<dialog id="tunesheet" class="sheet" aria-labelledby="tune-title"></dialog>
 
 <footer class="footer">
   <div class="wrap footer__inner">

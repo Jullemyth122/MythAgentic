@@ -21,7 +21,7 @@ const NO_TEXT = new Set(["SCRIPT", "STYLE", "NOSCRIPT", "TEMPLATE"]);
  * elements, so table cells such as "Price" and "Price on request" stay separate words.
  * @param {Node|null|undefined} node
  */
-function textOf(node) {
+export function textOf(node) {
   if (!node) return "";
   const parts = [];
   const walk = (n) => {
@@ -38,7 +38,7 @@ function textOf(node) {
  * The main content element: <main>, else [role=main], else <body>.
  * @param {Document} doc
  */
-function mainOf(doc) {
+export function mainOf(doc) {
   return doc.querySelector("main") ?? doc.querySelector("[role=main]") ?? doc.body ?? doc.documentElement;
 }
 
@@ -153,6 +153,7 @@ function measureTable(table) {
     cols,
     linkedRows: bodyRows.filter((r) => r.querySelector("a[href]")).length,
     priceOnRequest: (textOf(table).match(PRICE_ON_REQUEST) ?? []).length,
+    prices: (textOf(table).match(PRICE_SHOWN) ?? []).length,
   };
 }
 

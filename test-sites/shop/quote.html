@@ -3,21 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Request a quote · Narra &amp; Co. Furniture</title>
+<title>Request a quote · Oakline &amp; Co. Furniture</title>
 <link rel="stylesheet" href="style.css">
 <script src="demo-form.js" defer></script>
 </head>
-<body>
-<p class="demo">Demo site made for testing MythAgentic. Narra &amp; Co. Furniture is a made-up business. Do not enter real personal data.</p>
-<header>
-<strong>Narra &amp; Co. Furniture</strong>
-<nav><a href="index.html">Home</a><a href="catalog.html">Sofas</a><a href="quote.html">Request a quote</a><a href="contact.html">Contact</a></nav>
+<body class="page-inner page-quote">
+<p class="demo">Demo site made for testing MythAgentic. Oakline &amp; Co. Furniture is a made-up business. Do not enter real personal data.</p>
+<header class="site-header">
+<div class="site-header__inner">
+<a class="brand" href="index.html" aria-label="Oakline &amp; Co. Furniture, home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="#23201c" stroke-width="1.5"/><path d="M20 6v28M13 12c4 3 4 13 0 16M27 12c-4 3-4 13 0 16" stroke="#b07d4f" stroke-width="1.5" fill="none"/></svg><span class="brand__text"><span class="brand__name">Oakline & Co.</span><span class="brand__sub">Furniture</span></span></a>
+<nav class="site-nav" aria-label="Main"><a href="index.html">Home</a><a href="catalog.html">Sofas</a><a href="quote.html" aria-current="page">Request a quote</a><a href="contact.html">Contact</a></nav>
+
+</div>
 </header>
 <main>
 <h1>Request a quote</h1>
 <form action="#" method="post">
 <label for="q-sofa">Sofa model</label>
-<select id="q-sofa" name="sofa" required><option value="">Choose a sofa</option><option>Bayani 2-seater</option><option>Bayani 3-seater</option><option>Dalisay 3-seater</option><option>Dalisay L-shape</option><option>Habagat sofa bed</option><option>Liwayway loveseat</option><option>Tala modular 4</option><option>Tala modular 6</option></select>
+<select id="q-sofa" name="sofa" required><option value="">Choose a sofa</option><option>Harbor 2-seater</option><option>Harbor 3-seater</option><option>Meadow 3-seater</option><option>Meadow L-shape</option><option>Summit sofa bed</option><option>Willow loveseat</option><option>Aurora modular 4</option><option>Aurora modular 6</option></select>
 <label for="q-fabric">Fabric</label>
 <select id="q-fabric" name="fabric" required><option value="">Choose a fabric</option><option>Linen blend</option><option>Cotton canvas</option><option>Performance fabric</option><option>Velvet</option></select>
 <label for="q-color">Colour</label>
@@ -36,6 +39,12 @@
 </form>
 <p>We reply within two working days.</p>
 </main>
-<footer>© 2026 Narra &amp; Co. Furniture (made up). For testing only.</footer>
+<footer class="site-footer">
+<div class="site-footer__inner">
+<div class="site-footer__brand"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="#23201c" stroke-width="1.5"/><path d="M20 6v28M13 12c4 3 4 13 0 16M27 12c-4 3-4 13 0 16" stroke="#b07d4f" stroke-width="1.5" fill="none"/></svg><p><strong>Oakline & Co. Furniture</strong><br>Made-to-order sofas, built slowly. A made-up furniture maker for testing MythAgentic.</p></div>
+<nav class="site-footer__nav" aria-label="Footer"><a href="index.html">Home</a><a href="catalog.html">Sofas</a><a href="quote.html">Request a quote</a><a href="contact.html">Contact</a></nav>
+<p class="site-footer__legal">© 2026 Oakline &amp; Co. Furniture (made up). For testing only.</p>
+</div>
+</footer>
 </body>
 </html>
