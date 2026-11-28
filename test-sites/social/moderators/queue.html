@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review queue (practice) · Clipwave</title>
+<link rel="stylesheet" href="../style.css">
+<script src="../demo-form.js" defer></script>
+<script src="queue.js" defer></script>
+</head>
+<body class="page-detail page-moderators-queue">
+<p class="demo">Demo site made for testing MythAgentic. Clipwave is a made-up short video app; every clip, person and rule here is made up. Do not enter real personal data.</p>
+<header class="site-header">
+<div class="site-header__inner">
+<a class="brand" href="../index.html" aria-label="Clipwave Short videos, home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="3" width="34" height="34" rx="11" fill="#2de2e6"/><rect width="34" height="34" rx="11" fill="#ff3d7f"/><path d="M14 10.5v13l11-6.5z" fill="#0b0b10"/></svg><span class="brand__text"><span class="brand__name">Clipwave</span><span class="brand__sub">Short videos</span></span></a>
+<nav class="site-nav" aria-label="Main"><a href="../index.html">Home</a><a href="../guidelines.html">Community guidelines</a><a href="../rules.html">Rule breaks</a><a href="../report.html">Report a clip</a><a href="../appeal.html">Appeal a removal</a><a href="../moderators/handbook.html">Moderators</a><a href="../teens.html">Teen accounts</a><a href="../contact.html">Safety team</a></nav>
+<a class="header-cta" href="../report.html">Report a clip</a>
+</div>
+</header>
+<main>
+<h1>Review queue (practice)</h1>
+<p>Eight made-up reported clips. Pick one, play it, and decide it on the right. Practice only: nothing here reaches a real account.</p>
+<div class="console">
+<div class="console__list">
+<p class="console__progress"><span id="queue-count">8 of 8 clips waiting</span> <button type="button" class="queue__reset" hidden>Reset</button></p>
+<ol class="queue-list" aria-label="Clips in the queue">
+<li data-pick="CW-1042" data-status="waiting" class="is-selected"><button type="button" class="queue-item" aria-controls="cw-1042"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#8fd3ff"/><rect y="210" width="180" height="110" fill="#6b7a8f"/>
+<g class="drift"><rect x="20" y="110" width="110" height="100" fill="#f3d9b1"/><path d="M14 112 75 70l61 42z" fill="#c4553a"/><rect x="62" y="160" width="26" height="50" fill="#7a4a2a"/><rect x="96" y="132" width="22" height="20" fill="#cfe8ff"/><rect x="30" y="132" width="22" height="20" fill="#cfe8ff"/></g>
+<g class="bob"><circle cx="138" cy="176" r="12" fill="#f2c7a5"/><path d="M126 176a12 12 0 0 1 24 0c0-14-24-14-24 0z" fill="#3b2a20"/><rect x="126" y="188" width="24" height="44" rx="10" fill="#ff3d7f"/></g>
+</svg><span class="queue-item__text"><b>CW-1042</b><span>A day on my street</span><small>9 reports · Private information shown</small></span></button></li>
+<li data-pick="CW-1043" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1043"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#2b3a55"/><rect y="200" width="180" height="120" fill="#3c3c46"/>
+<g class="road"><rect x="86" y="200" width="8" height="22" fill="#ffd84d"/><rect x="86" y="240" width="8" height="22" fill="#ffd84d"/><rect x="86" y="280" width="8" height="22" fill="#ffd84d"/><rect x="86" y="320" width="8" height="22" fill="#ffd84d"/></g>
+<g class="shake"><rect x="40" y="150" width="100" height="44" rx="12" fill="#e2483d"/><rect x="56" y="128" width="68" height="30" rx="10" fill="#e2483d"/><rect x="62" y="133" width="56" height="20" rx="6" fill="#9fd4ff"/><circle cx="62" cy="196" r="12" fill="#111"/><circle cx="118" cy="196" r="12" fill="#111"/><circle cx="90" cy="84" r="10" fill="#f2c7a5"/><rect x="80" y="94" width="20" height="34" rx="8" fill="#2de2e6"/><path d="M80 104 60 92M100 104l20-12" stroke="#2de2e6" stroke-width="6" stroke-linecap="round"/></g>
+
+</svg><span class="queue-item__text"><b>CW-1043</b><span>Car surf challenge</span><small>31 reports · Dangerous act or challenge</small></span></button></li>
+<li data-pick="CW-1044" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1044"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#4a5568"/><rect width="180" height="150" fill="#a0aec0"/><rect x="40" y="46" width="100" height="94" fill="#cbd5e0"/><path d="M30 48 90 16l60 32z" fill="#e2e8f0"/><rect x="56" y="70" width="12" height="70" fill="#a0aec0"/><rect x="84" y="70" width="12" height="70" fill="#a0aec0"/><rect x="112" y="70" width="12" height="70" fill="#a0aec0"/>
+<g class="sway"><circle cx="30" cy="186" r="11" fill="#2d3748"/><rect x="20" y="197" width="20" height="40" rx="8" fill="#2d3748"/><circle cx="62" cy="180" r="11" fill="#1a202c"/><rect x="52" y="191" width="20" height="46" rx="8" fill="#1a202c"/><circle cx="150" cy="184" r="11" fill="#2d3748"/><rect x="140" y="195" width="20" height="42" rx="8" fill="#2d3748"/></g>
+<g class="shake"><circle cx="100" cy="178" r="11" fill="#744210"/><rect x="90" y="189" width="20" height="46" rx="8" fill="#744210"/><circle cx="122" cy="182" r="11" fill="#22543d"/><rect x="112" y="193" width="20" height="44" rx="8" fill="#22543d"/></g>
+
+</svg><span class="queue-item__text"><b>CW-1044</b><span>Town hall protest, live</span><small>4 reports · Violent or graphic content</small></span></button></li>
+<li data-pick="CW-1045" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1045"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#1a1033"/><circle class="glow" cx="90" cy="140" r="74" fill="#ffd166" opacity=".25"/>
+<g class="bob"><rect x="58" y="80" width="64" height="120" rx="12" fill="#222" stroke="#ffd166" stroke-width="3"/><rect x="64" y="90" width="52" height="96" rx="6" fill="#4c6fff"/><path d="M70 100l30 0-30 40z" fill="#fff" opacity=".2"/></g>
+
+
+</svg><span class="queue-item__text"><b>CW-1045</b><span>Phone giveaway</span><small>52 reports · Scam or fake giveaway</small></span></button></li>
+<li data-pick="CW-1046" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1046"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#e9e4dc"/><rect y="222" width="180" height="98" fill="#8a6a4f"/><rect x="18" y="40" width="54" height="40" rx="4" fill="#cfc6b8"/>
+<g class="talk"><circle cx="90" cy="134" r="26" fill="#d9a27a"/><path d="M64 132a26 26 0 0 1 52 0c0-22-52-22-52 0z" fill="#2b2b2b"/><rect x="60" y="160" width="60" height="66" rx="22" fill="#4c6fff"/></g>
+<g class="bob"><rect x="122" y="168" width="26" height="46" rx="5" fill="#222"/><rect x="125" y="172" width="20" height="36" rx="3" fill="#9aa5b1"/><rect x="128" y="200" width="6" height="4" fill="#e53e3e"/></g>
+</svg><span class="queue-item__text"><b>CW-1046</b><span>Nova X2 review</span><small>12 reports · Harassment or bullying</small></span></button></li>
+<li data-pick="CW-1047" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1047"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#141826"/><rect x="104" y="40" width="50" height="70" fill="#2a3350"/><path d="M129 40v70M104 75h50" stroke="#141826" stroke-width="3"/><circle cx="139" cy="58" r="7" fill="#e8e3c8" opacity=".7"/>
+<g class="breathe"><circle cx="70" cy="200" r="18" fill="#3a3f55"/><rect x="48" y="218" width="44" height="58" rx="18" fill="#3a3f55"/></g>
+
+</svg><span class="queue-item__text"><b>CW-1047</b><span>(no title)</span><small>3 reports · Self-harm</small></span></button></li>
+<li data-pick="CW-1048" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1048"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#101828"/><g class="drift"><rect x="-20" y="70" width="240" height="150" fill="#344054"/><circle cx="60" cy="140" r="34" fill="#475467"/><circle cx="130" cy="120" r="22" fill="#475467"/></g>
+<g class="glow"><rect x="20" y="236" width="140" height="8" rx="4" fill="#98a2b3"/><rect x="40" y="252" width="100" height="8" rx="4" fill="#98a2b3"/></g>
+
+</svg><span class="queue-item__text"><b>CW-1048</b><span>Shocking facts #47</span><small>18 reports · Spam</small></span></button></li>
+<li data-pick="CW-1049" data-status="waiting"><button type="button" class="queue-item" aria-controls="cw-1049"><svg class="queue-item__thumb" viewBox="0 0 180 320" aria-hidden="true"><rect width="180" height="320" fill="#0c0a09"/><path d="M50 20h80l40 300H10z" fill="#1c1917"/><path d="M70 20h40l20 300H50z" fill="#292524"/><circle class="glow" cx="90" cy="250" r="60" fill="#fef3c7" opacity=".12"/>
+
+
+</svg><span class="queue-item__text"><b>CW-1049</b><span>Haunted hallway prank</span><small>6 reports · Violent or graphic content</small></span></button></li>
+</ol>
+</div>
+<section class="console__stage" aria-label="Selected clip">
+<article class="clip is-selected" id="cw-1042" data-clip="CW-1042" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1042"><rect width="180" height="320" fill="#8fd3ff"/><rect y="210" width="180" height="110" fill="#6b7a8f"/>
+<g class="drift"><rect x="20" y="110" width="110" height="100" fill="#f3d9b1"/><path d="M14 112 75 70l61 42z" fill="#c4553a"/><rect x="62" y="160" width="26" height="50" fill="#7a4a2a"/><rect x="96" y="132" width="22" height="20" fill="#cfe8ff"/><rect x="30" y="132" width="22" height="20" fill="#cfe8ff"/></g>
+<g class="bob"><circle cx="138" cy="176" r="12" fill="#f2c7a5"/><path d="M126 176a12 12 0 0 1 24 0c0-14-24-14-24 0z" fill="#3b2a20"/><rect x="126" y="188" width="24" height="44" rx="10" fill="#ff3d7f"/></g>
+<g class="fx" data-from="6" data-to="12"><rect x="22" y="224" width="136" height="70" rx="6" fill="#fff" stroke="#222"/><text x="32" y="244" font-size="10" font-weight="700">M. Rivera</text><text x="32" y="261" font-size="9">14 Alder Lane, Springfield</text><text x="32" y="278" font-size="9">Tel 555-0142</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1042"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1042 · A day on my street</h3>
+<p class="clip__by">@mira.makes · Caption: “new place, new vlog”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 9 viewers: Private information shown</li><li><b>Automatic check:</b> Text that looks like a home address and a phone number at 0:08</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="shows"><time>0:00</time> <b>Shows:</b> Mira walks out of her front door and waves at the camera.</li>
+<li data-t="3" data-kind="says"><time>0:03</time> <b>Says:</b> <q>Okay, first vlog from the new place!</q></li>
+<li data-t="6" data-kind="shows"><time>0:06</time> <b>Shows:</b> She holds a parcel up to the camera.</li>
+<li data-t="8" data-kind="screen"><time>0:08</time> <b>On screen:</b> The parcel label shows a full name, street address and phone number: M. Rivera, 14 Alder Lane, Springfield, Tel 555-0142.</li>
+<li data-t="12" data-kind="says"><time>0:12</time> <b>Says:</b> <q>Look what came today!</q></li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1043" data-clip="CW-1043" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1043"><rect width="180" height="320" fill="#2b3a55"/><rect y="200" width="180" height="120" fill="#3c3c46"/>
+<g class="road"><rect x="86" y="200" width="8" height="22" fill="#ffd84d"/><rect x="86" y="240" width="8" height="22" fill="#ffd84d"/><rect x="86" y="280" width="8" height="22" fill="#ffd84d"/><rect x="86" y="320" width="8" height="22" fill="#ffd84d"/></g>
+<g class="shake"><rect x="40" y="150" width="100" height="44" rx="12" fill="#e2483d"/><rect x="56" y="128" width="68" height="30" rx="10" fill="#e2483d"/><rect x="62" y="133" width="56" height="20" rx="6" fill="#9fd4ff"/><circle cx="62" cy="196" r="12" fill="#111"/><circle cx="118" cy="196" r="12" fill="#111"/><circle cx="90" cy="84" r="10" fill="#f2c7a5"/><rect x="80" y="94" width="20" height="34" rx="8" fill="#2de2e6"/><path d="M80 104 60 92M100 104l20-12" stroke="#2de2e6" stroke-width="6" stroke-linecap="round"/></g>
+<g class="fx" data-from="2" data-to="16"><rect x="14" y="22" width="152" height="30" rx="8" fill="#ff3d7f"/><text x="90" y="42" font-size="12" font-weight="800" text-anchor="middle" fill="#fff">CAR SURF CHALLENGE</text></g>
+<g class="fx" data-from="9" data-to="16"><text x="90" y="246" font-size="11" font-weight="700" text-anchor="middle" fill="#fff">Tag 3 friends who'd try this</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1043"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1043 · Car surf challenge</h3>
+<p class="clip__by">@kai.stunts · Caption: “who's next #carsurf”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 31 viewers: Dangerous act or challenge</li><li><b>Automatic check:</b> Matches a challenge on the watch list: car surfing</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="shows"><time>0:00</time> <b>Shows:</b> A car drives fast down an open road.</li>
+<li data-t="2" data-kind="screen"><time>0:02</time> <b>On screen:</b> CAR SURF CHALLENGE</li>
+<li data-t="4" data-kind="shows"><time>0:04</time> <b>Shows:</b> A person stands on the roof of the moving car with both arms out, no safety gear.</li>
+<li data-t="6" data-kind="says"><time>0:06</time> <b>Says:</b> <q>No hands! Faster, faster!</q></li>
+<li data-t="9" data-kind="screen"><time>0:09</time> <b>On screen:</b> Tag 3 friends who'd try this</li>
+<li data-t="12" data-kind="says"><time>0:12</time> <b>Says:</b> <q>Your turn. Post it with #carsurf.</q></li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1044" data-clip="CW-1044" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1044"><rect width="180" height="320" fill="#4a5568"/><rect width="180" height="150" fill="#a0aec0"/><rect x="40" y="46" width="100" height="94" fill="#cbd5e0"/><path d="M30 48 90 16l60 32z" fill="#e2e8f0"/><rect x="56" y="70" width="12" height="70" fill="#a0aec0"/><rect x="84" y="70" width="12" height="70" fill="#a0aec0"/><rect x="112" y="70" width="12" height="70" fill="#a0aec0"/>
+<g class="sway"><circle cx="30" cy="186" r="11" fill="#2d3748"/><rect x="20" y="197" width="20" height="40" rx="8" fill="#2d3748"/><circle cx="62" cy="180" r="11" fill="#1a202c"/><rect x="52" y="191" width="20" height="46" rx="8" fill="#1a202c"/><circle cx="150" cy="184" r="11" fill="#2d3748"/><rect x="140" y="195" width="20" height="42" rx="8" fill="#2d3748"/></g>
+<g class="shake"><circle cx="100" cy="178" r="11" fill="#744210"/><rect x="90" y="189" width="20" height="46" rx="8" fill="#744210"/><circle cx="122" cy="182" r="11" fill="#22543d"/><rect x="112" y="193" width="20" height="44" rx="8" fill="#22543d"/></g>
+<g class="fx" data-from="0" data-to="16"><rect y="262" width="180" height="40" fill="#c53030"/><text x="8" y="279" font-size="10" font-weight="800" fill="#fff">CITY DESK · LIVE</text><text x="8" y="294" font-size="9" fill="#fff">Protest at the town hall</text></g>
+<g class="fx" data-from="5" data-to="11"><rect x="20" y="150" width="140" height="22" rx="6" fill="#000" opacity=".6"/><text x="90" y="165" font-size="9.5" fill="#fff" text-anchor="middle">Scuffle near the steps</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1044"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1044 · Town hall protest, live</h3>
+<p class="clip__by">@city.news.desk · Caption: “Live from the town hall. Two people were hurt in a scuffle; police say the protest is now calm.”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 4 viewers: Violent or graphic content</li><li><b>Automatic check:</b> Pushing and shoving at 0:05 (low confidence)</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="screen"><time>0:00</time> <b>On screen:</b> CITY DESK · LIVE · Protest at the town hall</li>
+<li data-t="2" data-kind="says"><time>0:02</time> <b>Says:</b> <q>We are outside the town hall, where about two hundred people have gathered.</q></li>
+<li data-t="5" data-kind="shows"><time>0:05</time> <b>Shows:</b> Two people push each other near the steps and others pull them apart. No injury is shown up close.</li>
+<li data-t="9" data-kind="says"><time>0:09</time> <b>Says:</b> <q>Police say two people were hurt, and the protest is now calm.</q></li>
+<li data-t="13" data-kind="shows"><time>0:13</time> <b>Shows:</b> The reporter signs off.</li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1045" data-clip="CW-1045" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1045"><rect width="180" height="320" fill="#1a1033"/><circle class="glow" cx="90" cy="140" r="74" fill="#ffd166" opacity=".25"/>
+<g class="bob"><rect x="58" y="80" width="64" height="120" rx="12" fill="#222" stroke="#ffd166" stroke-width="3"/><rect x="64" y="90" width="52" height="96" rx="6" fill="#4c6fff"/><path d="M70 100l30 0-30 40z" fill="#fff" opacity=".2"/></g>
+<g class="fx" data-from="0" data-to="16"><text x="90" y="46" font-size="18" font-weight="900" fill="#ffd166" text-anchor="middle">WIN THIS PHONE</text></g>
+<g class="fx" data-from="6" data-to="16"><rect x="14" y="222" width="152" height="30" rx="8" fill="#ffd166"/><text x="90" y="242" font-size="11" font-weight="800" text-anchor="middle">Send $5 to enter</text></g>
+<g class="fx" data-from="10" data-to="16"><text x="90" y="278" font-size="10" fill="#fff" text-anchor="middle">Card details in my DMs</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1045"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1045 · Phone giveaway</h3>
+<p class="clip__by">@lucky.drops · Caption: “FREE Nova X2!! 3 winners tonight”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 52 viewers: Scam or fake giveaway</li><li><b>Automatic check:</b> A giveaway that asks for money</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="screen"><time>0:00</time> <b>On screen:</b> WIN THIS PHONE</li>
+<li data-t="3" data-kind="says"><time>0:03</time> <b>Says:</b> <q>Three winners tonight, guys!</q></li>
+<li data-t="6" data-kind="screen"><time>0:06</time> <b>On screen:</b> Send $5 to enter</li>
+<li data-t="8" data-kind="says"><time>0:08</time> <b>Says:</b> <q>Just send five dollars and you're in.</q></li>
+<li data-t="10" data-kind="screen"><time>0:10</time> <b>On screen:</b> Card details in my DMs</li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1046" data-clip="CW-1046" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1046"><rect width="180" height="320" fill="#e9e4dc"/><rect y="222" width="180" height="98" fill="#8a6a4f"/><rect x="18" y="40" width="54" height="40" rx="4" fill="#cfc6b8"/>
+<g class="talk"><circle cx="90" cy="134" r="26" fill="#d9a27a"/><path d="M64 132a26 26 0 0 1 52 0c0-22-52-22-52 0z" fill="#2b2b2b"/><rect x="60" y="160" width="60" height="66" rx="22" fill="#4c6fff"/></g>
+<g class="bob"><rect x="122" y="168" width="26" height="46" rx="5" fill="#222"/><rect x="125" y="172" width="20" height="36" rx="3" fill="#9aa5b1"/><rect x="128" y="200" width="6" height="4" fill="#e53e3e"/></g>
+<g class="fx" data-from="0" data-to="16"><rect x="14" y="252" width="152" height="30" rx="8" fill="#222"/><text x="90" y="272" font-size="12" font-weight="800" fill="#fff" text-anchor="middle">Nova X2 review: 1/10</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1046"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1046 · Nova X2 review</h3>
+<p class="clip__by">@dev.rants · Caption: “honest review, not sponsored”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 12 viewers: Harassment or bullying</li><li><b>Automatic check:</b> Nothing found</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="screen"><time>0:00</time> <b>On screen:</b> Nova X2 review: 1/10</li>
+<li data-t="2" data-kind="says"><time>0:02</time> <b>Says:</b> <q>The battery is a joke. It died before lunch, every single day.</q></li>
+<li data-t="7" data-kind="says"><time>0:07</time> <b>Says:</b> <q>Nova support told me to restart it. Seriously.</q></li>
+<li data-t="11" data-kind="says"><time>0:11</time> <b>Says:</b> <q>Do not buy this phone. Save your money.</q></li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1047" data-clip="CW-1047" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1047"><rect width="180" height="320" fill="#141826"/><rect x="104" y="40" width="50" height="70" fill="#2a3350"/><path d="M129 40v70M104 75h50" stroke="#141826" stroke-width="3"/><circle cx="139" cy="58" r="7" fill="#e8e3c8" opacity=".7"/>
+<g class="breathe"><circle cx="70" cy="200" r="18" fill="#3a3f55"/><rect x="48" y="218" width="44" height="58" rx="18" fill="#3a3f55"/></g>
+<g class="fx" data-from="5" data-to="11"><text x="90" y="150" font-size="12" fill="#e6e6f0" text-anchor="middle">i can't do this anymore</text></g>
+<g class="fx" data-from="11" data-to="16"><text x="90" y="150" font-size="12" fill="#e6e6f0" text-anchor="middle">goodbye everyone</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1047"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1047 · (no title)</h3>
+<p class="clip__by">@sam_q · Caption: “.”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 3 viewers: Self-harm</li><li><b>Automatic check:</b> Words linked to self-harm at 0:05 and 0:11</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="shows"><time>0:00</time> <b>Shows:</b> A dark room. A person sits on the floor and does not speak.</li>
+<li data-t="5" data-kind="screen"><time>0:05</time> <b>On screen:</b> i can't do this anymore</li>
+<li data-t="11" data-kind="screen"><time>0:11</time> <b>On screen:</b> goodbye everyone</li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1048" data-clip="CW-1048" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1048"><rect width="180" height="320" fill="#101828"/><g class="drift"><rect x="-20" y="70" width="240" height="150" fill="#344054"/><circle cx="60" cy="140" r="34" fill="#475467"/><circle cx="130" cy="120" r="22" fill="#475467"/></g>
+<g class="glow"><rect x="20" y="236" width="140" height="8" rx="4" fill="#98a2b3"/><rect x="40" y="252" width="100" height="8" rx="4" fill="#98a2b3"/></g>
+<g class="fx" data-from="0" data-to="16"><rect x="10" y="20" width="160" height="40" rx="6" fill="#facc15"/><text x="90" y="37" font-size="10.5" font-weight="900" text-anchor="middle">YOU WON'T BELIEVE</text><text x="90" y="52" font-size="10.5" font-weight="900" text-anchor="middle">FACT #47</text></g>
+<g class="fx" data-from="9" data-to="16"><text x="90" y="290" font-size="11" font-weight="700" fill="#fff" text-anchor="middle">Follow for part 48</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1048"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1048 · Shocking facts #47</h3>
+<p class="clip__by">@viral.facts.daily · Caption: “follow for part 48!!”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 18 viewers: Spam</li><li><b>Automatic check:</b> The same AI voice-over and footage posted 212 times by 40 new accounts in 24 hours</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="screen"><time>0:00</time> <b>On screen:</b> YOU WON'T BELIEVE FACT #47</li>
+<li data-t="2" data-kind="says"><time>0:02</time> <b>Says:</b> <q>Scientists are hiding this one simple fact from you.</q></li>
+<li data-t="5" data-kind="shows"><time>0:05</time> <b>Shows:</b> Looping stock footage while a computer voice reads a made-up fact with no source.</li>
+<li data-t="9" data-kind="screen"><time>0:09</time> <b>On screen:</b> Follow for part 48</li>
+<li data-t="12" data-kind="shows"><time>0:12</time> <b>Shows:</b> Word for word the same as the account's last 211 clips.</li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+<article class="clip" id="cw-1049" data-clip="CW-1049" data-status="waiting">
+<div class="clip__player" data-duration="16">
+<svg class="clip__scene" viewBox="0 0 180 320" role="img" aria-label="Clip CW-1049"><rect width="180" height="320" fill="#0c0a09"/><path d="M50 20h80l40 300H10z" fill="#1c1917"/><path d="M70 20h40l20 300H50z" fill="#292524"/><circle class="glow" cx="90" cy="250" r="60" fill="#fef3c7" opacity=".12"/>
+<g class="fx" data-from="3" data-to="10"><rect x="104" y="100" width="40" height="110" fill="#44403c"/><circle cx="124" cy="120" r="14" fill="#e7e5e4"/><circle cx="119" cy="117" r="3" fill="#0c0a09"/><circle cx="129" cy="117" r="3" fill="#0c0a09"/><path d="M117 127q7 6 14 0" stroke="#0c0a09" stroke-width="2" fill="none"/></g>
+<g class="fx shake" data-from="6" data-to="9"><text x="90" y="80" font-size="22" font-weight="900" fill="#f87171" text-anchor="middle">AAAH!</text></g>
+<g class="fx" data-from="7" data-to="10"><rect x="40" y="280" width="100" height="20" rx="4" fill="#000"/><text x="90" y="294" font-size="9.5" fill="#fff" text-anchor="middle">[strong language]</text></g></svg>
+<div class="clip__subs" aria-hidden="true"></div>
+<div class="clip__verdict" aria-hidden="true"></div>
+<span class="clip__time" aria-hidden="true">0:00 / 0:16</span>
+<div class="clip__bar" aria-hidden="true"><i></i></div>
+<button type="button" class="clip__play" aria-label="Play clip CW-1049"></button>
+</div>
+<div class="clip__info">
+<h3>CW-1049 · Haunted hallway prank</h3>
+<p class="clip__by">@nightshift.pranks · Caption: “my roommate screamed (strong language)”</p>
+<ul class="clip__flags"><li><b>Reports:</b> 6 viewers: Violent or graphic content</li><li><b>Automatic check:</b> A loud scream at 0:06 and strong language at 0:07</li></ul>
+<ol class="clip__timeline">
+<li data-t="0" data-kind="shows"><time>0:00</time> <b>Shows:</b> A dark hallway, lit only by a phone torch.</li>
+<li data-t="3" data-kind="shows"><time>0:03</time> <b>Shows:</b> A friend in a rubber mask jumps out of a cupboard.</li>
+<li data-t="6" data-kind="says"><time>0:06</time> <b>Says:</b> <q>(screams) Get OUT of here!</q></li>
+<li data-t="7" data-kind="screen"><time>0:07</time> <b>On screen:</b> [strong language]</li>
+<li data-t="10" data-kind="shows"><time>0:10</time> <b>Shows:</b> Both laugh, and the friend takes off the mask. Nobody is hurt.</li>
+</ol>
+<p class="clip__status">Status: <b>Waiting for a decision</b></p>
+</div>
+</article>
+</section>
+<aside class="console__decide" aria-labelledby="decide-title">
+<h2 id="decide-title">Apply a decision</h2>
+<button type="button" class="decide__next" hidden>Next waiting clip →</button>
+<p class="decide__hint" id="decide-hint"><b>Remove</b> only when a rule is broken. <b>Warning label</b>: news or stunts with context. <b>18+ only</b>: no rule broken, but not right for teen accounts (jump scares, strong language). <b>Urgent</b>: someone may be in danger, so the safety team goes first. No strike when it was an accident. Nothing is applied until you press Apply decision and confirm.</p>
+<form id="decision" action="#" method="post" aria-describedby="decide-hint">
+<label for="d_clip">Clip</label>
+<select id="d_clip" name="clip" required><option value="">Choose a clip</option><option value="CW-1042">CW-1042 · A day on my street</option><option value="CW-1043">CW-1043 · Car surf challenge</option><option value="CW-1044">CW-1044 · Town hall protest, live</option><option value="CW-1045">CW-1045 · Phone giveaway</option><option value="CW-1046">CW-1046 · Nova X2 review</option><option value="CW-1047">CW-1047 · (no title)</option><option value="CW-1048">CW-1048 · Shocking facts #47</option><option value="CW-1049">CW-1049 · Haunted hallway prank</option></select>
+<fieldset class="chips">
+<legend>Decision</legend>
+<label><input type="radio" name="decision" value="Keep: no rule broken" required><span data-tone="keep">Keep</span></label>
+<label><input type="radio" name="decision" value="Keep with a warning label" required><span data-tone="label">Warning label</span></label>
+<label><input type="radio" name="decision" value="Age-restrict: 18+ only" required><span data-tone="label">18+ only</span></label>
+<label><input type="radio" name="decision" value="Remove the clip" required><span data-tone="remove">Remove</span></label>
+<label><input type="radio" name="decision" value="Mute the sound" required><span data-tone="label">Mute sound</span></label>
+<label><input type="radio" name="decision" value="Second look by a senior moderator" required><span data-tone="keep">Second look</span></label>
+<label><input type="radio" name="decision" value="Urgent: send to the safety team" required><span data-tone="remove">Urgent: safety team</span></label>
+</fieldset>
+<label for="d_rule">Rule it breaks</label>
+<select id="d_rule" name="rule" required><option value="">Choose a rule</option><option>None: no rule broken</option><option>Hate speech</option><option>Harassment or bullying</option><option>Threats of violence</option><option>Dangerous act or challenge</option><option>Self-harm</option><option>Child safety</option><option>Nudity or sexual content</option><option>Violent or graphic content</option><option>Scam or fake giveaway</option><option>Spam</option><option>Private information shown</option><option>Copyright</option><option>Pretending to be someone else</option><option>False information</option><option>Something else</option></select>
+<div class="decide__row">
+<div><label for="d_moment">Moment</label><input id="d_moment" name="moment" type="text" placeholder="0:08"></div>
+<div><label for="d_strike">Strike</label><select id="d_strike" name="strike" required><option value="">Choose</option><option>No strike</option><option>1 strike</option><option>Close the account</option></select></div>
+</div>
+<div class="decide__label"><label for="d_label">Label shown on the clip</label><input id="d_label" name="label" type="text" placeholder="18+: jump scare and strong language"></div>
+<label for="d_note">Note to the creator</label>
+<textarea id="d_note" name="note" rows="3" required placeholder="The rule, the moment and what you saw, in one or two calm sentences."></textarea>
+<details class="decide__more"><summary>Note for the second moderator</summary><textarea id="d_second" name="second_note" rows="2" aria-label="Note for the second moderator"></textarea></details>
+<label class="decide__check"><input type="checkbox" name="notify" value="yes" checked> Tell the people who reported it</label>
+<button type="submit">Apply decision</button>
+</form>
+</aside>
+</div>
+</main>
+<footer class="site-footer">
+<div class="site-footer__inner">
+<div class="site-footer__brand"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><rect x="3" y="3" width="34" height="34" rx="11" fill="#2de2e6"/><rect width="34" height="34" rx="11" fill="#ff3d7f"/><path d="M14 10.5v13l11-6.5z" fill="#0b0b10"/></svg><p><strong>Clipwave Short videos</strong><br>Short videos, kind community. A made-up app for testing MythAgentic.</p></div>
+<nav class="site-footer__nav" aria-label="Footer"><a href="../index.html">Home</a><a href="../guidelines.html">Community guidelines</a><a href="../rules.html">Rule breaks</a><a href="../report.html">Report a clip</a><a href="../appeal.html">Appeal a removal</a><a href="../moderators/handbook.html">Moderators</a><a href="../teens.html">Teen accounts</a><a href="../contact.html">Safety team</a></nav>
+<p class="site-footer__legal">© 2026 Clipwave (made up). Demo site for testing only. Safety team: safety@clipwave.example</p>
+</div>
+</footer>
+</body>
+</html>

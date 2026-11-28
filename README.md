@@ -40,22 +40,44 @@ npm install
 npm start                         # then open http://localhost:8090
 ```
 
+`npm start` restarts the server when a file in `server/` or `src/` changes. Use
+`npm run start:once` to run it without that.
+
 On the website:
 
-1. Pick a sample (clinic, tours, shop or bakery), or paste a public URL you own or may scan.
-2. Click any card to see its evidence, score parts, and the rules that decided it. Change
-   "How important is this task" to see the formula re-run.
-3. Pick the agent spots to build and select **Build agent pack**. The pack is checked with
-   the challenge's own `build_network.mjs --check`.
-4. For a sample, select **Open the agentified site**, add your own AI key in
-   **⚙ AI model settings** (Meta, OpenRouter or Otari), and ask in one sentence.
-   For any other site, download the pack as a ZIP.
+1. Put a key in a `.env` file next to `package.json` (never committed) and restart:
+   `GEMINI_API_KEY=...` (Google AI Studio, free tier works) or `META_API_KEY=...`. The
+   website then uses it automatically. Or select **AI key** (top right) to pick Gemini, Meta,
+   OpenRouter or another OpenAI-compatible provider, pick any model your key can use (the
+   screen asks the provider for its list), or paste a key that
+   is saved only in your browser. Scanning and scoring never use AI; the key is only for the
+   assistants you build. Gemini and Meta calls go through this server's relay
+   (`/byok/gemini/v1`, `/byok/v1`), which passes the key on without logging or keeping it.
+2. Pick a sample, or paste a public URL you own or may scan. Four samples are customer
+   websites (clinic, tours, shop, bakery); three are staff handbooks where new employees
+   learn the job (coffee shop, logistics warehouse, call center).
+3. Every card shows the real page with the part it is about outlined in pink. **Pages read**
+   lists every page the scanner read and what it measured there. Click a card for its
+   evidence, score parts and rules; change "How important is this task" to re-run the formula.
+4. Optional: **Improve with AI**. Tell your model what visitors come for, or ask what it
+   would change. It reads the scan and writes the assistant's greeting, rules and Ask bar
+   questions, plus ideas that quote what was measured. Edit them and select **Use these in
+   my pack**. It never changes a score or a decision.
+5. Pick the agent spots and select **Build agent pack**. It is checked with the challenge's
+   own `build_network.mjs --check`. **Before / After** shows each page with its assistant:
+   an **Ask** button on every page opens it in a side panel, and an Ask bar sits right at
+   each part of the page that scored. While it answers, it scrolls the page to the part it
+   used and highlights it (`website_show_on_page`).
+   - A sample becomes an agentified copy of the site: the assistant fills its forms.
+   - A live URL becomes a **preview copy** of its scanned pages (its own HTML and styles,
+     page scripts off, forms send nothing). `mode: "companion"` builds the skill's live URL
+     mode instead: a separate page that answers from a snapshot of the public pages.
 
 Command line:
 
 ```shell
 npm test                          # all tests
-npm run scan -- clinic            # scan a test site: clinic, tours, shop or clear
+npm run scan -- clinic            # scan a test site: clinic, tours, shop, clear, cafe, warehouse or callcenter
 npm run scan -- clinic --json     # the full result
 ```
 
@@ -64,7 +86,7 @@ Example (the made-up dental clinic in `test-sites/clinic`):
 | Spot | F·V·Fi·E·R | Priority | Decision |
 |---|---|---|---|
 | Book a visit form (12 fields, 3 steps) | 5·5·5·1·2 | 63 | Inline form helper |
-| HMO and FAQ questions | 3·4·4·1·1 | 48 | Answer desk (public facts only) |
+| Insurance and FAQ questions | 3·4·4·1·1 | 48 | Answer desk (public facts only) |
 | check_slots for other agents | 3·5·4·3·1 | 20 | Plan next: needs the clinic's schedule |
 | Prices ("price on request") | 4·2·2·1·1 | 16 | No agent: publish the prices |
 | Contact page (no opening hours) | 2·2·1·1·1 | 4 | No agent: add opening hours |

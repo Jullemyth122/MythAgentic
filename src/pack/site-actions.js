@@ -55,6 +55,14 @@ export class PackActions {
       }
     }
     if (placement.contact) actions.register(PackActions.contactAction(placement.contact));
+    if (placement.sitePages?.length) {
+      actions.register(PackActions.searchAction(placement.sitePages));
+      actions.register(PackActions.goAction(placement.sitePages));
+    }
+    if (placement.siteMap?.length) actions.register(PackActions.mapAction(placement.siteMap));
+    actions.register(PackActions.showAction());
+    actions.register(PackActions.guideAction());
+    actions.register(PackActions.tableAction());
   }
 
   /** Load placement.json once. */
@@ -87,7 +95,7 @@ export class PackActions {
   static onPage(path) {
     const here = new URL(document.URL);
     const there = PackActions.pageUrl(path);
-    const strip = (p) => p.replace(/index\.html$/, "");
+    const strip = (p) => p.replace(/index\.html$/, "").replace(/\/$/, "");
     return strip(here.pathname) === strip(there.pathname);
   }
 
@@ -124,12 +132,50 @@ export class PackActions {
    * A write action that fills the form, and sends nothing.
    * @param {object} spot
    */
+  /** Today in the visitor's own time zone, for dates like "next Tuesday". */
+  static today() {
+    const now = new Date();
+    const iso = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+    return { iso, text: `${iso} (${now.toLocaleDateString("en-US", { weekday: "long" })})` };
+  }
+
+  /** Date fields of a form set to a day that has already passed. */
+  static pastDates(form) {
+    const { iso } = PackActions.today();
+    return [...form.elements].filter((el) => el.type === "date" && el.value && el.value < iso)
+      .map((el) => `${el.labels?.[0]?.textContent?.trim() || el.name} (${el.value})`);
+  }
+
+  /**
+   * What the page itself says about how to fill a form: the text its aria-describedby points
+   * at, or the paragraphs right before it. The agent gets the page's own guidance with the action.
+   * @param {object} spot
+   */
+  static formHelp(spot) {
+    if (typeof document === "undefined") return "";
+    const form = PackActions.formOf(spot);
+    if (!form) return "";
+    const ids = (form.getAttribute("aria-describedby") ?? "").split(/\s+/).filter(Boolean);
+    let parts = ids.map((id) => document.getElementById(id)?.textContent ?? "");
+    if (parts.every((t) => !t.trim())) {
+      parts = [];
+      for (let el = form.previousElementSibling; el && parts.length < 2; el = el.previousElementSibling) {
+        if (el.matches("p, .note")) parts.unshift(el.textContent ?? "");
+        else if (!el.matches(".agent-hook")) break;
+      }
+    }
+    const help = parts.join(" ").replace(/\s+/g, " ").trim();
+    return help.length > 500 ? `${help.slice(0, 497)}...` : help;
+  }
+
   static fillAction(spot) {
     const properties = {};
     for (const field of spot.fields) properties[field.name] = PackActions.fieldSchema(field);
+    const hasDate = spot.fields.some((f) => f.type === "date");
+    const help = PackActions.formHelp(spot);
     return {
       name: spot.fillName,
-      description: `Fill the "${spot.title}" form on ${spot.path} with details the visitor gave. Pass only the fields they gave; never invent values. It fills the visible form, which the visitor can still change, and sends nothing. Returns the filled fields and the required fields still empty. Works only while the visitor is on ${spot.path}.`,
+      description: `Fill the "${spot.title}" form on ${spot.path} with details the visitor gave. Pass only the fields they gave; never invent values. It fills the visible form, which the visitor can still change, and sends nothing. Returns the filled fields and the required fields still empty. Works only while the visitor is on ${spot.path}.${hasDate ? ` Today is ${PackActions.today().text}: work out dates like "next Tuesday" from it.` : ""}${help ? ` The page says about this form: "${help}"` : ""}`,
       effect: "write",
       inputSchema: { type: "object", additionalProperties: false, properties },
       execute: (args) => PackActions.fill(spot, args),
@@ -163,6 +209,11 @@ export class PackActions {
       first.dispatchEvent(new Event("input", { bubbles: true }));
       first.dispatchEvent(new Event("change", { bubbles: true }));
       filled.push(name);
+    }
+    PackActions.spotlight(form);
+    const past = PackActions.pastDates(form);
+    if (past.length > 0) {
+      return { ok: false, filled, reason: `${past.join(", ")} is in the past. Today is ${PackActions.today().text}. Fill the date again.` };
     }
     return { ok: true, filled, stillEmpty: PackActions.missing(form), note: "Nothing was sent. The visitor can check the form on the page." };
   }
@@ -223,6 +274,8 @@ export class PackActions {
     if (!form) return { ok: false, reason: `This form is on another page: ${PackActions.pageUrl(spot.path).href}.` };
     const missing = PackActions.missing(form);
     if (missing.length > 0) return { ok: false, reason: `Still needed: ${missing.join(", ")}.`, missing };
+    const past = PackActions.pastDates(form);
+    if (past.length > 0) return { ok: false, reason: `${past.join(", ")} is in the past. Today is ${PackActions.today().text}.` };
     return { ok: true, form };
   }
 
@@ -253,28 +306,49 @@ export class PackActions {
   static readAnswersAction(spot) {
     return {
       name: spot.readName,
-      description: `Read the questions and answers on "${spot.title}" (${spot.path}). Call it before answering any question about ${spot.topics}. Returns each question with its answer and the page URL to cite.`,
+      description: `Read the questions and answers on "${spot.title}" (${spot.path})${(spot.paths?.length ?? 1) > 1 ? ` and ${spot.paths.length - 1} more pages with questions` : ""}. Call it before answering any question about ${spot.topics}. Returns each question with its answer and the page URL to cite.`,
       effect: "read",
-      inputSchema: { type: "object", additionalProperties: false, properties: {} },
-      execute: () => PackActions.readAnswers(spot),
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          query: { type: "string", maxLength: 200, description: "Optional: the visitor's words. Answers that share words with it come first." },
+        },
+      },
+      execute: (args) => PackActions.readAnswers(spot, args?.query),
     };
   }
 
   /** @param {object} spot */
-  static async readAnswers(spot) {
-    const { main, url } = await PackActions.readPage(spot.path);
-    const answers = [];
-    let current = null;
-    for (const el of main.querySelectorAll("h1, h2, h3, h4, summary, p, li, dd")) {
-      if (/^H[1-4]$|^SUMMARY$/.test(el.tagName)) {
-        current = { question: textOf(el), answer: "" };
-        answers.push(current);
-      } else if (current) {
-        current.answer = `${current.answer} ${textOf(el)}`.trim();
+  static async readAnswers(spot, query = "") {
+    const paths = spot.paths?.length ? spot.paths : [spot.path];
+    const items = [];
+    for (const p of paths) {
+      let page;
+      try {
+        page = await PackActions.readPage(p);
+      } catch {
+        continue; // One missing page should not hide the others' answers.
+      }
+      let current = null;
+      for (const el of page.main.querySelectorAll("h1, h2, h3, h4, summary, p, li, dd")) {
+        if (/^H[1-4]$|^SUMMARY$/.test(el.tagName)) {
+          current = { question: textOf(el), answer: "", url: page.url };
+          items.push(current);
+        } else if (current) {
+          current.answer = `${current.answer} ${textOf(el)}`.trim();
+        }
       }
     }
-    const items = answers.filter((a) => a.answer);
-    return { ok: true, url, items: PackActions.limit(items) };
+    let answered = items.filter((a) => a.answer);
+    const words = String(query).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((w) => w.length > 2);
+    if (words.length) {
+      const hits = (a) => words.filter((w) => `${a.question} ${a.answer}`.toLowerCase().includes(w)).length;
+      answered = answered.map((a) => [hits(a), a]).sort((x, y) => y[0] - x[0]).map(([, a]) => a);
+    }
+    const shown = PackActions.limit(answered);
+    PackActions.cite(shown.map((a) => ({ url: a.url, heading: a.question })));
+    return { ok: true, url: PackActions.pageUrl(spot.path).href, items: shown };
   }
 
   /** @param {object} spot */
@@ -303,7 +377,9 @@ export class PackActions {
       if (link) option.link = new URL(link.getAttribute("href"), url).href;
       return option;
     });
-    return { ok: true, url, columns, options: PackActions.limit(options) };
+    const listed = PackActions.limit(options);
+    PackActions.cite(listed.map((o) => ({ url, heading: String(Object.values(o)[0] ?? "") })));
+    return { ok: true, url, columns, options: listed };
   }
 
   /** @param {{path:string, title:string}} contact */
@@ -318,6 +394,327 @@ export class PackActions {
         return { ok: true, url, text: textOf(main).slice(0, MAX_TEXT) };
       },
     };
+  }
+
+  /**
+   * A read action over every public page of the site, so the assistant can answer about
+   * anything the site says, not only the parts it was placed at.
+   * @param {string[]} pages  site paths
+   */
+  static searchAction(pages) {
+    return {
+      name: "search_site",
+      description: `Search all ${pages.length} pages of this website for the visitor's words. Returns the best matching sections, each with its page link. Use it for any question the other actions do not cover, such as products, ideas, prices, plans, occasions, how things work or policies. Answer only from what it returns, and give the page link.`,
+      effect: "read",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["query"],
+        properties: { query: { type: "string", minLength: 2, maxLength: 200, description: "The visitor's question or its key words." } },
+      },
+      execute: (args) => PackActions.searchSite(pages, args.query),
+    };
+  }
+
+  /**
+   * Every page split into sections at its headings, read once per visit.
+   * @param {string[]} pages
+   */
+  static async sections(pages) {
+    if (!PackActions.sectionCache) {
+      const out = [];
+      for (const p of pages) {
+        let page;
+        try {
+          page = await PackActions.readPage(p);
+        } catch {
+          continue;
+        }
+        // Text before the first heading belongs to the page as a whole (named by its title).
+        let current = { url: page.url, heading: textOf(page.doc.querySelector("title")), text: "", whole: true };
+        out.push(current);
+        for (const el of page.main.querySelectorAll("h1, h2, h3, h4, p, li, dt, dd, summary, td, button, figcaption, blockquote")) {
+          if (/^H[1-4]$/.test(el.tagName)) {
+            current = { url: page.url, heading: textOf(el), text: "" };
+            out.push(current);
+          } else if (!el.parentElement?.closest("p, li, dd, td, summary, button") && current.text.length < 1500) {
+            current.text = `${current.text} ${textOf(el)}`.trim();
+          }
+        }
+      }
+      PackActions.sectionCache = out.filter((s) => s.heading || s.text);
+    }
+    return PackActions.sectionCache;
+  }
+
+  /**
+   * The sections that share the most words with the query, best first.
+   * @param {string[]} pages
+   * @param {string} query
+   */
+  static async searchSite(pages, query) {
+    const words = PackActions.words(query);
+    if (words.length === 0) return { ok: false, reason: "Pass the visitor's question or its key words." };
+    const all = await PackActions.sections(pages);
+    const score = (s) => {
+      const head = s.heading.toLowerCase();
+      const body = s.text.toLowerCase();
+      return words.reduce((n, w) => n + (head.includes(w) ? 3 : 0) + (body.includes(w) ? 1 : 0), 0);
+    };
+    const hits = all.map((s) => [score(s), s]).filter(([n]) => n > 0).sort((a, b) => b[0] - a[0]).slice(0, 8).map(([, s]) => s);
+    if (hits.length === 0) return { ok: true, results: [], note: "Nothing on the site matches. Say so, and offer the contact page if there is one." };
+    const results = PackActions.limit(hits);
+    PackActions.cite(results.filter((r) => !r.whole).map((r) => ({ url: r.url, heading: r.heading })));
+    return { ok: true, results };
+  }
+
+  /**
+   * A read action that changes nothing: it scrolls the visitor's page to the part the
+   * assistant is answering from and highlights it.
+   */
+  static showAction() {
+    return {
+      name: "show_on_page",
+      description: "Scroll the page the visitor has open to the part you are answering from, and highlight it, so they can see it on the site itself. Pass the exact question heading, table row or form title you used. Changes nothing on the page. Returns found false when that part is not on the open page; then give the visitor the page link instead.",
+      effect: "read",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["text"],
+        properties: { text: { type: "string", minLength: 2, maxLength: 200, description: "The question heading, row text or form title to show, as the site words it." } },
+      },
+      execute: (args) => PackActions.show(args.text),
+    };
+  }
+
+  /**
+   * Find the part of the open page that best matches the text, scroll to it and highlight it.
+   * @param {string} text
+   */
+  static show(text) {
+    if (PackActions.words(text).length === 0) return { ok: false, reason: "Pass the words of the heading or row to show." };
+    const el = PackActions.find(text);
+    if (!el) return { ok: true, found: false, note: "That part is not on the page the visitor has open." };
+    PackActions.spotlight(el);
+    return { ok: true, found: true, shown: textOf(el).slice(0, 160) };
+  }
+
+  /**
+   * The element on the open page that best matches some words: a heading, a button, a field
+   * (by its label or placeholder), a link, a table row or a short paragraph. A heading that
+   * opens its own card gives the card. Null when nothing matches well.
+   * @param {string} text
+   * @param {{lift?: boolean}} [options]
+   */
+  static find(text, { lift = true } = {}) {
+    const words = PackActions.words(text);
+    if (words.length === 0) return null;
+    let best = null;
+    let bestScore = 0;
+    const candidates = "h1, h2, h3, h4, h5, summary, legend, caption, tr, th, dt, label, li, button, a[href], input[placeholder], textarea[placeholder], select, p";
+    for (const el of document.body.querySelectorAll(candidates)) {
+      if (el.closest("#assistant, .agent-hook, .agent-launcher, .agent-coach, .mythagentic-preview")) continue;
+      const label = el.matches("input, textarea") ? el.getAttribute("placeholder") ?? "" : el.matches("select") ? (el.labels?.[0]?.textContent ?? el.name) : textOf(el);
+      if (el.tagName === "P" && label.length > 220) continue;
+      const own = PackActions.words(label);
+      if (own.length === 0) continue;
+      const hits = words.filter((w) => own.includes(w)).length;
+      // Most of the asked words, and few extra words: a button or heading beats a paragraph.
+      const score = hits / words.length - Math.max(0, own.length - words.length) * 0.01;
+      if (hits / words.length >= 0.6 && score > bestScore) { best = el; bestScore = score; }
+    }
+    if (!best || !lift) return best;
+    let shown = best.tagName === "SUMMARY" ? best.parentElement : best;
+    const parent = shown.parentElement;
+    const main = document.querySelector("main") ?? document.body;
+    if (/^H[1-5]$/.test(shown.tagName) && parent && parent !== main && parent.querySelector("h1, h2, h3, h4, h5") === shown && textOf(parent).length < 2500) shown = parent;
+    if (shown.tagName === "DETAILS") shown.open = true;
+    return shown;
+  }
+
+  /**
+   * Tell the panel (assistant-dock.js) to show something on the page.
+   * @param {string} type  "tour" or "navigate"
+   * @param {object} detail
+   */
+  static ui(type, detail) {
+    if (typeof document === "undefined") return;
+    document.dispatchEvent(new CustomEvent(`agent:${type}`, { detail }));
+  }
+
+  /** A guided tour on the open page: numbered steps with notes, Back and Next. */
+  static guideAction() {
+    return {
+      name: "guide_on_page",
+      description: "Walk the visitor through the page they have open, step by step: each step outlines one button, field, heading or row on the page and shows your short note next to it, with Back and Next. Use it when they ask how to do something here (send, sign up, choose, use a feature) or where things are on this page. Each step's text must be the exact words of something on the page (a button label, a field's label or placeholder, a heading). Returns which steps were found.",
+      effect: "read",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["steps"],
+        properties: {
+          title: { type: "string", maxLength: 80, description: "What the tour shows, such as \"How to send a bouquet\"." },
+          steps: {
+            type: "array",
+            minItems: 1,
+            maxItems: 6,
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["text", "note"],
+              properties: {
+                text: { type: "string", minLength: 2, maxLength: 120, description: "Exact words of the button, field, heading or row." },
+                note: { type: "string", minLength: 2, maxLength: 200, description: "What to do there, in one short sentence." },
+              },
+            },
+          },
+        },
+      },
+      execute: (args) => PackActions.guide(args),
+    };
+  }
+
+  /** @param {{title?:string, steps:Array<{text:string, note:string}>}} args */
+  static guide({ title = "", steps }) {
+    const found = [];
+    const missing = [];
+    for (const step of steps) {
+      const el = PackActions.find(step.text);
+      if (el && !found.some((f) => f.el === el)) found.push({ el, note: step.note, text: step.text });
+      else if (!el) missing.push(step.text);
+    }
+    if (found.length === 0) return { ok: true, found: 0, missing, note: "None of these are on the open page. Use the visitor's page, or website_go_to_page first." };
+    PackActions.ui("tour", { title, steps: found });
+    return { ok: true, found: found.length, missing, note: "The tour is on the page now. Tell the visitor to follow the numbered steps." };
+  }
+
+  /** Point at the rows and columns of a table that answer the visitor. */
+  static tableAction() {
+    return {
+      name: "highlight_table",
+      description: "On a table on the open page, highlight the rows and/or columns that answer the visitor, grey out the rest, and show a one-line note on the table. Use it when they compare options, plans or prices that sit in a table. Rows are named by their first cell, columns by their header, exactly as the table shows them.",
+      effect: "read",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        properties: {
+          rows: { type: "array", maxItems: 12, items: { type: "string", maxLength: 120 }, description: "First-cell text of each row to highlight." },
+          columns: { type: "array", maxItems: 4, items: { type: "string", maxLength: 80 }, description: "Header text of each column to highlight." },
+          note: { type: "string", maxLength: 200, description: "One short line on what the highlight shows." },
+        },
+      },
+      execute: (args) => PackActions.highlightTable(args),
+    };
+  }
+
+  /** @param {{rows?:string[], columns?:string[], note?:string}} args */
+  static highlightTable({ rows = [], columns = [], note = "" }) {
+    const same = (a, b) => {
+      const wa = PackActions.words(a);
+      const wb = PackActions.words(b);
+      const part = (x, y) => x.length > 0 && x.filter((w) => y.includes(w)).length / x.length >= 0.6;
+      // "Spanish latte (16 oz)" matches the row "Spanish latte", and the other way round.
+      return part(wa, wb) || part(wb, wa);
+    };
+    let best = null;
+    for (const table of document.querySelectorAll("table")) {
+      if (table.closest("#assistant")) continue;
+      const trs = [...table.querySelectorAll("tr")];
+      const header = [...(trs[0]?.querySelectorAll("th, td") ?? [])].map(textOf);
+      const rowHits = trs.filter((tr) => rows.some((r) => same(r, textOf(tr.querySelector("th, td"))))).length;
+      const colHits = columns.filter((c) => header.some((h) => same(c, h))).length;
+      const score = rowHits + colHits * 2;
+      if (score > (best?.score ?? 0)) best = { table, trs, header, score };
+    }
+    if (!best) return { ok: true, found: false, note: "No table on the open page has those rows or columns." };
+    // The note first: showing it clears what was drawn before, then the new marks go on.
+    PackActions.ui("tour", { title: "", steps: [{ el: best.table, note: note || "Highlighted in the table." }] });
+    for (const el of document.querySelectorAll(".agent-row, .agent-col, .agent-table-focus")) el.classList.remove("agent-row", "agent-col", "agent-table-focus");
+    const colIndex = best.header.map((h, i) => (columns.some((c) => same(c, h)) ? i : -1)).filter((i) => i >= 0);
+    const marked = [];
+    best.trs.forEach((tr, i) => {
+      const cells = [...tr.querySelectorAll("th, td")];
+      if (i > 0 && rows.some((r) => same(r, textOf(cells[0])))) { tr.classList.add("agent-row"); marked.push(textOf(cells[0])); }
+      for (const c of colIndex) cells[c]?.classList.add("agent-col");
+    });
+    if (marked.length) best.table.classList.add("agent-table-focus");
+    return { ok: true, found: true, rows: marked, columns: colIndex.map((i) => best.header[i]) };
+  }
+
+  /** Every page of the site with its title and headings, so the assistant knows where things are. */
+  static mapAction(siteMap) {
+    return {
+      name: "site_map",
+      description: "List every page of this website with its title and main headings. Use it to find which page has what the visitor wants before taking them there.",
+      effect: "read",
+      inputSchema: { type: "object", additionalProperties: false, properties: {} },
+      execute: () => ({ ok: true, pages: PackActions.limit(siteMap) }),
+    };
+  }
+
+  /** Take the visitor to another page of the site, with the part they want outlined there. */
+  static goAction(pages) {
+    return {
+      name: "go_to_page",
+      description: "Take the visitor to another page of this website and outline the part they want when it opens. Tell them where you are taking them first. The page changes about 3 seconds later, and they can press Stay here; this chat starts fresh on the new page, so put what to look at in reason.",
+      effect: "write",
+      inputSchema: {
+        type: "object",
+        additionalProperties: false,
+        required: ["path", "reason"],
+        properties: {
+          path: { type: "string", enum: pages, description: "The page to open." },
+          show: { type: "string", maxLength: 120, description: "Optional: the heading or button on that page to outline." },
+          reason: { type: "string", minLength: 2, maxLength: 200, description: "One sentence for the visitor: what to look at there." },
+        },
+      },
+      execute: (args) => PackActions.goTo(pages, args),
+    };
+  }
+
+  /** @param {string[]} pages @param {{path:string, show?:string, reason:string}} args */
+  static goTo(pages, { path, show = "", reason }) {
+    if (!pages.includes(path)) return { ok: false, reason: `${path} is not a page of this site.` };
+    if (PackActions.onPage(path)) {
+      const el = show ? PackActions.find(show) : null;
+      if (el) PackActions.ui("tour", { title: "", steps: [{ el, note: reason }] });
+      return { ok: true, note: "The visitor is already on that page." };
+    }
+    const url = PackActions.pageUrl(path);
+    if (show) url.searchParams.set("show", show);
+    PackActions.ui("navigate", { url: url.href, path, reason });
+    return { ok: true, note: `Opening ${path} in about 3 seconds.` };
+  }
+
+  /**
+   * Lower-case words of three or more letters.
+   * @param {string} text
+   */
+  static words(text) {
+    return String(text).toLowerCase().split(/[^\p{L}\p{N}]+/u).filter((w) => w.length > 2);
+  }
+
+  /**
+   * Tell the panel which parts of the site an action returned.
+   * @param {Array<{url:string, heading:string}>} sources
+   */
+  static cite(sources) {
+    // The panel (assistant-dock.js) shows which of these the answer used, and where they are.
+    if (typeof document === "undefined") return;
+    document.dispatchEvent(new CustomEvent("agent:sources", { detail: sources.filter((s) => s.url && s.heading) }));
+  }
+
+  /**
+   * Scroll to an element and outline it (styles in assistant-dock.css).
+   * @param {Element} el
+   */
+  static spotlight(el) {
+    if (typeof document === "undefined" || !el) return;
+    for (const old of document.querySelectorAll(".agent-spotlight")) old.classList.remove("agent-spotlight");
+    el.classList.add("agent-spotlight");
+    el.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
+    clearTimeout(PackActions.spotlightTimer);
+    PackActions.spotlightTimer = setTimeout(() => el.classList.remove("agent-spotlight"), 8000);
   }
 
   /**

@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Damage report · Swiftline Logistics</title>
+<link rel="stylesheet" href="style.css">
+<script src="demo-form.js" defer></script>
+</head>
+<body class="page-inner page-damage-report">
+<p class="demo">Demo site made for testing MythAgentic. Swiftline Logistics is a made-up business and this is a made-up staff handbook. Do not enter real personal data.</p>
+<header class="site-header">
+<div class="site-header__inner">
+<a class="brand" href="index.html" aria-label="Swiftline Logistics · Floor guide, home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="4" fill="#ffc400"/><path d="M9 12l8 8-8 8M19 12l8 8-8 8" stroke="#16181d" stroke-width="4" fill="none" stroke-linejoin="miter"/></svg><span class="brand__text"><span class="brand__name">Swiftline</span><span class="brand__sub">Logistics · Floor guide</span></span></a>
+<nav class="site-nav" aria-label="Main"><a href="index.html">Home</a><a href="receiving.html">Receiving</a><a href="codes.html">Exception codes</a><a href="safety.html">Safety</a><a href="damage-report.html" aria-current="page">Damage report</a><a href="contact.html">Who to call</a></nav>
+
+</div>
+</header>
+<main>
+<h1>File a damage report</h1>
+<p>File one report per damaged parcel, before the end of your shift. Photograph the parcel first.</p>
+<form id="damage" action="#" method="post">
+<label for="tracking">Tracking number</label>
+<input id="tracking" name="tracking" type="text" required placeholder="SL-0000-0000">
+<label for="code">Exception code</label>
+<select id="code" name="code" required><option value="">Choose</option><option>DMG</option><option>ADD</option><option>REF</option><option>MIS</option><option>HLD</option><option>RTS</option></select>
+<label for="area">Where you found it</label>
+<select id="area" name="area" required><option value="">Choose</option><option>Dock 2 receiving</option><option>Sorting conveyor</option><option>Staging</option><option>Dispatch</option><option>Returns cage</option></select>
+<label for="damage">Type of damage</label>
+<select id="damage" name="damage" required><option value="">Choose</option><option>Torn box</option><option>Crushed</option><option>Wet</option><option>Leaking</option><option>Opened</option><option>Other</option></select>
+<label><input type="checkbox" name="photo" value="yes"> I took a photo of the parcel</label>
+<label for="description">What you saw</label>
+<textarea id="description" name="description" rows="3" required></textarea>
+<label for="reporter">Your name</label>
+<input id="reporter" name="reporter" type="text" required>
+<label for="shift">Your shift</label>
+<select id="shift" name="shift" required><option value="">Choose</option><option>6:00 AM to 2:00 PM</option><option>2:00 PM to 10:00 PM</option><option>10:00 PM to 6:00 AM</option></select>
+<label for="supervisor">Supervisor you told</label>
+<select id="supervisor" name="supervisor" required><option value="">Choose</option><option>Supervisor Sam (made up)</option><option>Supervisor Riley (made up)</option><option>Supervisor Morgan (made up)</option></select>
+<button type="submit">File report</button>
+</form>
+</main>
+<footer class="site-footer">
+<div class="site-footer__inner">
+<div class="site-footer__brand"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="4" fill="#ffc400"/><path d="M9 12l8 8-8 8M19 12l8 8-8 8" stroke="#16181d" stroke-width="4" fill="none" stroke-linejoin="miter"/></svg><p><strong>Swiftline Logistics</strong><br>Floor guide for the Riverside distribution center. Made up, for testing MythAgentic.</p></div>
+<nav class="site-footer__nav" aria-label="Footer"><a href="index.html">Home</a><a href="receiving.html">Receiving</a><a href="codes.html">Exception codes</a><a href="safety.html">Safety</a><a href="damage-report.html">Damage report</a><a href="contact.html">Who to call</a></nav>
+<p class="site-footer__legal">© 2026 Swiftline Logistics (made up). Staff handbook for testing only.</p>
+</div>
+</footer>
+</body>
+</html>

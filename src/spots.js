@@ -25,7 +25,7 @@ export function purposeOf(text) {
 }
 
 /**
- * The business's name, from the home page title ("Home · Ngiti Dental Clinic") or host.
+ * The business's name, from the home page title ("Home · Brightside Dental Clinic") or host.
  * @param {{origin:string, pages:Array<{path:string,title:string}>}} crawl
  */
 export function siteNameOf(crawl) {
@@ -83,6 +83,7 @@ function formSpots(page, form, pages) {
       scores: { friction: 3, value: VALUE_FOR_PURPOSE.account, fit: 3, effort: 5, risk: 5 },
       flags: { secrets: true, regulated: page.mentionsHealth },
       source: { path: page.path },
+      target: { path: page.path, find: "form", index: form.index },
     });
     spot.signals.push({ id: "password_field", text: "The form asks for a password" });
     if (page.mentionsHealth) spot.signals.push({ id: "health_words", text: "The page mentions health records (records, X-rays, treatment, patients)" });
@@ -109,6 +110,8 @@ function formSpots(page, form, pages) {
   if (form.pays) { risk = 5; flags.payment = true; }
   if (form.hasCard) { risk = 5; flags.payment = true; flags.secrets = true; }
   if (form.hasIdNumber) { risk = 5; flags.secrets = true; }
+  // A form on a page about minors (teen accounts, parental consent) collects minors' data (V4).
+  if (page.mentionsMinors) { risk = 5; flags.minors = true; }
 
   const spot = makeSpot({
     id: `form:${page.path}#${form.id || `form-${form.index}`}`,
@@ -119,19 +122,21 @@ function formSpots(page, form, pages) {
     scores: { friction, value, fit, effort, risk },
     flags,
     source: { path: page.path, formIndex: form.index, formId: form.id, title: where, submitText: form.submitText, steps: form.steps, fields: form.fields },
+    target: { path: page.path, find: "form", index: form.index },
   });
   spot.signals.push({ id: "field_count", text: `${plural(form.fieldCount, "field")}, ${form.requiredCount} required` });
   if (form.steps > 1) spot.signals.push({ id: "steps", text: `${form.steps} steps` });
   if (form.largestSelect >= 8) spot.signals.push({ id: "big_dropdown", text: `A dropdown with ${form.largestSelect} options` });
   if (form.missingLabels > 0) spot.signals.push({ id: "missing_labels", text: `${plural(form.missingLabels, "field")} with no label` });
   if (form.submitText) spot.signals.push({ id: "submit_text", text: `Submit button: "${form.submitText}"` });
+  if (flags.minors) spot.signals.push({ id: "minors_words", text: "The page is about minors (words like minors, parental consent, for children)" });
   if (form.missingLabels > 0) spot.fixes.push({ text: `Add labels to ${plural(form.missingLabels, "form field")}` });
   spot.why = {
     friction: `${plural(form.fieldCount, "field")}${form.steps >= 3 ? ` in ${form.steps} steps` : ""}`,
     value: `Purpose "${purpose}"`,
     fit: `${plural(form.fieldCount, "field")} an agent can fill from one sentence${form.largestSelect >= 10 ? `, and a ${form.largestSelect}-option dropdown` : ""}`,
     effort: page.needsBrowser ? "The form is drawn by JavaScript" : "A plain HTML form",
-    risk: flags.payment ? "Takes a payment" : flags.secrets ? "Asks for ID or card numbers" : form.method === "post" ? "Sends a request the business can undo" : "Read-only",
+    risk: flags.minors ? "Collects data about minors" : flags.payment ? "Takes a payment" : flags.secrets ? "Asks for ID or card numbers" : form.method === "post" ? "Sends a request the business can undo" : "Read-only",
   };
 
   const spots = [spot];
@@ -145,6 +150,7 @@ function formSpots(page, form, pages) {
       needsConnector: true,
       scores: { friction: 3, value: 5, fit: 4, effort: 3, risk: 1 },
       source: { path: page.path },
+      target: { path: page.path, find: "form", index: form.index },
     });
     slots.signals.push({ id: "date_time_typed", text: "The visitor types a date and a time" });
     slots.signals.push({ id: "no_slots_shown", text: "No free slots are shown before sending" });
@@ -194,6 +200,10 @@ export function findSpots(crawl) {
   for (const page of pages) {
     for (const [tableIndex, table] of page.tables.entries()) {
       if (table.rows < 6 || table.cols < 4) continue;
+      // Items a visitor chooses between link to their own pages or have prices. A table of
+      // facts (a privacy policy, a list of shortcuts) is reading, not a choice.
+      const choice = table.linkedRows * 2 >= table.rows || table.prices > 0 || table.priceOnRequest > 0;
+      if (!choice) continue;
       const targets = page.links.map((l) => groupOf.get(l.url)).filter((g) => g && g.urls.length > 1);
       const template = targets[0];
       const spot = makeSpot({
@@ -204,10 +214,12 @@ export function findSpots(crawl) {
         pages: [page.url],
         scores: { friction: 4, value: VALUE_FOR_PURPOSE.compare, fit: clamp(table.rows >= 10 ? 5 : 4), effort: 1, risk: 1 },
         source: { path: page.path, tableIndex, title: page.h1 || page.title, rows: table.rows, cols: table.cols },
+        target: { path: page.path, find: "table", index: tableIndex },
       });
       spot.signals.push({ id: "similar_items", text: `${table.rows} similar items in one table` });
       spot.signals.push({ id: "attributes", text: `${table.cols} columns to compare` });
       if (template) spot.signals.push({ id: "template_pages", text: `${template.urls.length} pages share one item template` });
+      if (table.linkedRows * 2 >= table.rows) spot.signals.push({ id: "linked_rows", text: `${table.linkedRows} of ${table.rows} rows link to their own page` });
       if (table.priceOnRequest > 0) spot.signals.push({ id: "no_price_in_table", text: `${table.priceOnRequest} of ${table.rows} rows have no price` });
       spot.why = {
         friction: "Visitors compare many rows by hand",
@@ -220,30 +232,42 @@ export function findSpots(crawl) {
     }
   }
 
-  // Answers: a long FAQ or policy page.
-  for (const group of groups) {
-    const page = byUrl.get(group.representative);
-    if (page.questions < 5 && page.words < 600) continue;
-    const coverage = COVERAGE_WORDS.test(page.headings.join(" "));
-    const friction = page.words >= 1500 ? 4 : page.words >= 600 || page.questions >= 8 ? 3 : 2;
-    const fit = page.questions >= 8 ? 4 : 3;
+  // Answers: one answer desk for the whole site (rule R4: one front agent), over every page
+  // that answers questions. A long page with no questions is reading, not a FAQ.
+  const answerPages = pages
+    .filter((p) => p.questions >= 5 || (p.questions >= 2 && p.words >= 600))
+    .sort((a, b) => b.questions - a.questions || b.words - a.words);
+  if (answerPages.length > 0) {
+    const page = answerPages[0];
+    const questions = answerPages.reduce((n, p) => n + p.questions, 0);
+    const words = answerPages.reduce((n, p) => n + p.words, 0);
+    const coverage = answerPages.some((p) => COVERAGE_WORDS.test(p.headings.join(" ")));
+    const health = answerPages.some((p) => p.mentionsHealth);
+    const friction = page.words >= 1500 || words >= 3000 ? 4 : page.words >= 600 || questions >= 8 ? 3 : 2;
+    const fit = questions >= 8 ? 4 : 3;
+    const more = answerPages.length - 1;
     const spot = makeSpot({
       id: `answers:${page.path}`,
-      label: `Questions on ${page.h1 || page.path}`,
+      label: more ? `Questions on ${page.h1 || page.path} and ${plural(more, "more page")}` : `Questions on ${page.h1 || page.path}`,
       kind: "answers",
       purpose: "learn",
-      pages: [...group.urls],
+      pages: answerPages.map((p) => p.url),
       scores: { friction, value: coverage ? 4 : VALUE_FOR_PURPOSE.learn, fit, effort: 1, risk: 1 },
-      publicFactsOnly: page.mentionsHealth,
-      source: { path: page.path, title: page.h1 || page.title, questions: page.questions, words: page.words },
+      publicFactsOnly: health,
+      source: {
+        path: page.path, title: page.h1 || page.title, questions, words,
+        pages: answerPages.map((p) => ({ path: p.path, title: p.h1 || p.title, questions: p.questions, words: p.words })),
+      },
+      target: { path: page.path, find: "question", index: 0 },
     });
-    spot.signals.push({ id: "questions", text: `${plural(page.questions, "question")} answered in ${plural(page.words, "word")}` });
+    spot.signals.push({ id: "questions", text: `${plural(page.questions, "question")} answered in ${plural(page.words, "word")} on ${page.path}` });
+    if (more) spot.signals.push({ id: "more_pages", text: `${plural(more, "more page")} with questions: ${plural(questions, "question")} on ${plural(answerPages.length, "page")} in all` });
     if (coverage) spot.signals.push({ id: "coverage_questions", text: "Questions about coverage, payment or delivery, asked before buying" });
-    if (page.mentionsHealth) spot.signals.push({ id: "health_topic", text: "Health topic: public facts only" });
+    if (health) spot.signals.push({ id: "health_topic", text: "Health topic: public facts only" });
     spot.why = {
-      friction: `${plural(page.words, "word")} to read for one answer`,
+      friction: `${plural(words, "word")} to read for one answer`,
       value: coverage ? "Coverage questions decide whether a visitor books or buys" : "Learning supports a later task",
-      fit: `${plural(page.questions, "question")}: answering from text is language work`,
+      fit: `${plural(questions, "question")}: answering from text is language work`,
       effort: "The answers are already on the page",
       risk: "Read-only",
     };
@@ -263,6 +287,7 @@ export function findSpots(crawl) {
       pages: priceless.map((p) => p.url),
       scores: { friction: 4, value: VALUE_FOR_PURPOSE.price, fit: 2, effort: 1, risk: 1 },
       source: { path: priceless[0].path, mentions },
+      target: { path: priceless[0].path, find: "price", index: 0 },
     });
     spot.signals.push({ id: "price_on_request", text: `"Price on request" ${plural(mentions, "time")} on ${plural(priceless.length, "page")}` });
     spot.signals.push({ id: "no_prices", text: `No prices shown on any of ${plural(pages.length, "page")}` });
@@ -290,6 +315,7 @@ export function findSpots(crawl) {
       pages: [contact.url],
       scores: { friction: hours ? 1 : 2, value: VALUE_FOR_PURPOSE.contact, fit: 1, effort: 1, risk: 1 },
       source: { path: contact.path, title: contact.h1 || contact.title },
+      target: { path: contact.path, find: "page", index: 0 },
     });
     if (hours) {
       spot.signals.push({ id: "hours_shown", text: "Opening hours are shown" });

@@ -3,27 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Menu · Panaderya Liwayway</title>
+<title>Menu · Sunrise Bakery</title>
 <link rel="stylesheet" href="style.css">
 <script src="demo-form.js" defer></script>
 </head>
-<body>
-<p class="demo">Demo site made for testing MythAgentic. Panaderya Liwayway is a made-up business. Do not enter real personal data.</p>
-<header>
-<strong>Panaderya Liwayway</strong>
-<nav><a href="index.html">Home</a><a href="menu.html">Menu</a><a href="order.html">Pre-order</a><a href="contact.html">Contact</a></nav>
+<body class="page-inner page-menu">
+<p class="demo">Demo site made for testing MythAgentic. Sunrise Bakery is a made-up business. Do not enter real personal data.</p>
+<header class="site-header">
+<div class="site-header__inner">
+<a class="brand" href="index.html" aria-label="Sunrise Bakery, home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="20" fill="#9a4a21"/><path d="M8 26a12 12 0 0 1 24 0z" fill="#f6c453"/><path d="M20 8v4M9 13l3 3M31 13l-3 3M5 21h3M32 21h3" stroke="#f6c453" stroke-width="2.4" stroke-linecap="round"/><path d="M6 29h28" stroke="#fff8ee" stroke-width="2.4" stroke-linecap="round"/></svg><span class="brand__text"><span class="brand__name">Sunrise</span><span class="brand__sub">Bakery</span></span></a>
+<nav class="site-nav" aria-label="Main"><a href="index.html">Home</a><a href="menu.html" aria-current="page">Menu</a><a href="order.html">Pre-order</a><a href="contact.html">Contact</a></nav>
+<a class="header-cta" href="order.html">Pre-order</a>
+</div>
 </header>
 <main>
 <h1>Menu</h1>
 <table>
 <tr><th>Item</th><th>Price</th></tr>
-<tr><td>Pandesal (10 pieces)</td><td>₱50</td></tr>
-<tr><td>Ensaymada</td><td>₱35</td></tr>
-<tr><td>Ube cheese pandesal (6 pieces)</td><td>₱90</td></tr>
-<tr><td>Spanish bread (6 pieces)</td><td>₱60</td></tr>
-<tr><td>Monay</td><td>₱12</td></tr>
+<tr><td>Dinner rolls (10 pieces)</td><td>$5</td></tr>
+<tr><td>Cinnamon roll</td><td>$3</td></tr>
+<tr><td>Cheese buns (6 pieces)</td><td>$6</td></tr>
+<tr><td>Butter croissants (6 pieces)</td><td>$8</td></tr>
+<tr><td>Sourdough loaf</td><td>$7</td></tr>
 </table>
 </main>
-<footer>© 2026 Panaderya Liwayway (made up). For testing only.</footer>
+<footer class="site-footer">
+<div class="site-footer__inner">
+<div class="site-footer__brand"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="20" fill="#9a4a21"/><path d="M8 26a12 12 0 0 1 24 0z" fill="#f6c453"/><path d="M20 8v4M9 13l3 3M31 13l-3 3M5 21h3M32 21h3" stroke="#f6c453" stroke-width="2.4" stroke-linecap="round"/><path d="M6 29h28" stroke="#fff8ee" stroke-width="2.4" stroke-linecap="round"/></svg><p><strong>Sunrise Bakery</strong><br>Baked before the sun comes up. A made-up bakery for testing MythAgentic.</p></div>
+<nav class="site-footer__nav" aria-label="Footer"><a href="index.html">Home</a><a href="menu.html">Menu</a><a href="order.html">Pre-order</a><a href="contact.html">Contact</a></nav>
+<p class="site-footer__legal">© 2026 Sunrise Bakery (made up). For testing only.</p>
+</div>
+</footer>
 </body>
 </html>

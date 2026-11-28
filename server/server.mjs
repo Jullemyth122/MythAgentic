@@ -17,22 +17,38 @@ import { findSpots, siteNameOf } from "../src/spots.js";
 import { decidePlan } from "../src/score.js";
 import { buildPack, listFiles, slugify } from "../src/pack/build.js";
 import { zipFolder } from "../src/pack/zip.js";
+import { snapshotFor } from "../src/pack/snapshot.js";
+import { mirrorPage } from "../src/pack/mirror.js";
+import { collectionFor, placementFor } from "../src/pack/build.js";
+import { viewHtml, VIEW_HEADERS } from "../src/view.js";
+import { briefFor } from "../src/brief.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const PORT = Number(process.env.PORT ?? 8090);
 const HOST = process.env.HOST ?? "localhost";
 
+// A local .env may hold META_API_KEY and GEMINI_API_KEY. They are read here only, and
+// never sent to a browser.
+try { process.loadEnvFile(path.join(ROOT, ".env")); } catch { /* no .env */ }
+
+/** Where the local relay at /byok/v1 forwards to: the Meta Model API (OpenAI-compatible). */
+const META_ROUTER = "https://api.meta.ai/v1";
+
 /** The sample sites: made-up businesses with known problems. */
 const SAMPLES = [
-  { id: "clinic", cover: "book.html", name: "Ngiti Dental Clinic", blurb: "A 12-field booking form, HMO questions, prices on request and a patient portal.", tags: ["Healthcare", "Booking"] },
-  { id: "tours", cover: "tours.html", name: "Isla Verde Tours", blurb: "Six island tours to compare, a reservation form and a long policy page.", tags: ["Travel", "Reservations"] },
-  { id: "shop", cover: "catalog.html", name: "Narra & Co. Furniture", blurb: "Eight similar sofas, every price on request, and a quote form.", tags: ["Retail", "Quotes"] },
-  { id: "clear", cover: "menu.html", name: "Panaderya Liwayway", blurb: "A clear little bakery site with prices and hours. The right answer is no agent.", tags: ["Food", "No agent"] },
+  { id: "clinic", cover: "book.html", name: "Brightside Dental Clinic", blurb: "A 12-field booking form, insurance questions, prices on request and a patient portal.", tags: ["Healthcare", "Booking"] },
+  { id: "tours", cover: "tours.html", name: "Blue Bay Island Tours", blurb: "Six island tours to compare, a reservation form and a long policy page.", tags: ["Travel", "Reservations"] },
+  { id: "shop", cover: "catalog.html", name: "Oakline & Co. Furniture", blurb: "Eight similar sofas, every price on request, and a quote form.", tags: ["Retail", "Quotes"] },
+  { id: "clear", cover: "menu.html", name: "Sunrise Bakery", blurb: "A clear little bakery site with prices and hours. The right answer is no agent.", tags: ["Food", "No agent"] },
+  { id: "cafe", cover: "drinks.html", name: "Corner Street Coffee", blurb: "A coffee shop barista handbook: opening and closing checklists, six drink build cards, food safety questions and a shift swap form.", tags: ["Staff onboarding", "Food service"] },
+  { id: "warehouse", cover: "codes.html", name: "Swiftline Logistics", blurb: "A logistics warehouse floor guide: receiving steps, six exception codes, safety rules and a damage report form.", tags: ["Staff onboarding", "Logistics"] },
+  { id: "callcenter", cover: "escalation.html", name: "Northstar Support", blurb: "A call center agent handbook: an escalation matrix, call handling questions, leave requests, and a payroll form no AI may touch.", tags: ["Staff onboarding", "Call center"] },
+  { id: "social", cover: "rules.html", name: "Clipwave", blurb: "A short video app: community guidelines, a rule breaks table, a report form, a teen consent form no AI may touch, and a moderator console where only people remove clips.", tags: ["Social media", "Moderation"] },
 ];
 
 /** Scans kept for building packs, newest last. */
 const scans = new Map();
-const MAX_SCANS = 30;
+const MAX_SCANS = 10;
 
 const TYPES = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".mjs": "text/javascript; charset=utf-8",
@@ -80,15 +96,22 @@ async function checkPublicUrl(raw) {
 async function scan(body) {
   let crawl;
   let sample = null;
+  // Keep each page's HTML, to show the page as it was read and to build a companion.
+  const htmls = new Map();
+  const keeping = (fetcher) => async (url) => {
+    const res = await fetcher(url);
+    if (res.status === 200 && /html/i.test(res.contentType)) htmls.set(url, res.text);
+    return res;
+  };
   if (body.sample) {
     sample = SAMPLES.find((s) => s.id === body.sample);
     if (!sample) throw new Error("Unknown sample.");
     const origin = `https://${sample.id}.sample`;
-    crawl = await crawlSite(`${origin}/`, { fetcher: folderFetcher(path.join(ROOT, "test-sites", sample.id), origin), parse });
+    crawl = await crawlSite(`${origin}/`, { fetcher: keeping(folderFetcher(path.join(ROOT, "test-sites", sample.id), origin)), parse });
   } else {
     if (body.permission !== true) throw new Error("Tick the box to confirm you own this site or may scan it.");
     const url = await checkPublicUrl(String(body.url ?? "").trim());
-    crawl = await crawlSite(url.href, { fetcher: httpFetcher(), parse, maxPages: 40 });
+    crawl = await crawlSite(url.href, { fetcher: keeping(httpFetcher()), parse, maxPages: 40 });
     if (crawl.pages.length === 0) {
       const reason = crawl.skipped[0]?.reason ?? "no HTML pages found";
       throw new Error(`Could not read any page (${reason}).`);
@@ -98,7 +121,7 @@ async function scan(body) {
   const plan = decidePlan(spots, { size });
   const id = `${Date.now().toString(36)}${Math.random().toString(36).slice(2, 7)}`;
   const name = sample?.name ?? siteNameOf(crawl);
-  scans.set(id, { id, sample, name, crawl, size, spots, plan });
+  scans.set(id, { id, sample, name, crawl, size, spots, plan, htmls });
   while (scans.size > MAX_SCANS) scans.delete(scans.keys().next().value);
 
   const jsPages = crawl.pages.filter((p) => p.needsBrowser).length;
@@ -110,7 +133,13 @@ async function scan(body) {
       sample: sample?.id ?? null,
       preview: sample ? `/samples/${sample.id}/` : crawl.origin,
       size,
-      pages: crawl.pages.map((p) => ({ path: p.path, title: p.title, url: p.url })),
+      pages: crawl.pages.map((p) => ({
+        path: p.path, title: p.title, url: p.url, h1: p.h1, words: p.words, questions: p.questions,
+        headings: p.headings.slice(0, 12),
+        forms: p.forms.map((f) => ({ index: f.index, fields: f.fieldCount, submit: f.submitText, password: f.hasPassword })),
+        tables: p.tables.map((t, i) => ({ index: i, rows: t.rows, cols: t.cols })),
+        priceOnRequest: p.priceOnRequest, pricesShown: p.pricesShown, hasHours: p.hasHours, needsBrowser: p.needsBrowser,
+      })),
       groups: groups.map((g) => ({ id: g.id, pages: g.urls.length })),
       skipped: crawl.skipped,
       robotsFound: crawl.robotsFound,
@@ -118,6 +147,8 @@ async function scan(body) {
       drawnByJs: jsPages,
     },
     spots,
+    // The real words of each spot, for the "Improve with AI" helper (text only).
+    brief: briefFor({ spots, pages: crawl.pages, htmls, parse }),
   };
 }
 
@@ -135,17 +166,54 @@ async function pack(body) {
   const plan = decidePlan(spots, { size: kept.size });
   const name = kept.sample ? kept.sample.id : `site-${slugify(new URL(kept.crawl.origin).hostname)}`;
   const outDir = path.join(ROOT, "generated", name);
+  const approved = Array.isArray(body.approved) ? body.approved : null;
+  let snapshot = null;
+  let mirror = null;
+  const livePages = kept.crawl.pages.filter((p) => kept.htmls.has(p.url));
+  if (!kept.sample && body.mode !== "companion") {
+    // A live site: a preview copy of its scanned pages with the assistant placed on them,
+    // so the owner sees their own site agentified. Forms in the copy send nothing.
+    const pagePaths = new Set(livePages.map((p) => p.path));
+    mirror = {
+      pages: livePages.map((p) => ({
+        path: p.path,
+        html: `<!doctype html>\n${mirrorPage(kept.htmls.get(p.url), { pageUrl: p.url, pagePaths, parse }).documentElement.outerHTML}`,
+      })),
+    };
+  } else if (!kept.sample) {
+    // The official live URL mode: a separate companion page that answers from a snapshot.
+    const compares = placementFor(plan, approved).spots.filter((s) => s.kind === "compare");
+    snapshot = snapshotFor({
+      source: `${kept.crawl.origin}/`,
+      fetchedAt: new Date().toISOString().slice(0, 10),
+      parse,
+      pages: livePages.map((p) => ({ url: p.url, title: p.title, html: kept.htmls.get(p.url) })),
+      tables: compares.map((s) => ({ collection: collectionFor(s), url: new URL(s.path, kept.crawl.origin).href, tableIndex: s.tableIndex })),
+    });
+  }
   const result = await buildPack({
     siteName: kept.name,
     plan,
-    approved: Array.isArray(body.approved) ? body.approved : null,
+    approved,
     siteDir: kept.sample ? path.join(ROOT, "test-sites", kept.sample.id) : null,
+    snapshot,
+    mirror,
+    // The owner's approved words for the assistant (written with the AI helper); text only.
+    tuning: body.tuning ?? null,
     outDir,
   });
+  // The page each spot was named after comes first, so the preview opens where the Ask bar is.
+  const main = new Set(result.spots.map((s) => s.path));
+  const ordered = [...result.mounted].sort((a, b) => Number(main.has(b)) - Number(main.has(a)));
+  const after = (p) => (kept.sample || mirror ? `/generated/${name}${p}` : `/generated/${name}/`);
   return {
     ...result,
     name,
-    openUrl: kept.sample ? `/generated/${name}${result.mounted[0] ?? "/"}` : null,
+    mirror: !!mirror,
+    openUrl: after(ordered[0] ?? "/"),
+    // Before and after for each page that got the assistant: the page as scanned, and the
+    // same page with the assistant placed on it.
+    previews: (result.companion ? [] : ordered).map((p) => ({ path: p, before: `/api/view/${kept.id}?path=${encodeURIComponent(p)}`, after: after(p) })),
     zipUrl: `/api/zip/${name}`,
   };
 }
@@ -198,11 +266,96 @@ function notFound(res) {
   res.end("Not found");
 }
 
+/**
+ * Shows one scanned page as it was read, with the asked-for part outlined.
+ * GET /api/view/<scanId>?path=/page.html&find=form&index=1
+ */
+function view(res, scanId, params) {
+  const kept = scans.get(scanId);
+  if (!kept) return notFound(res);
+  const pagePath = params.get("path") ?? "/";
+  const page = kept.crawl.pages.find((p) => p.path === pagePath);
+  const html = page && kept.htmls.get(page.url);
+  if (!html) return notFound(res);
+  const base = kept.sample ? `/samples/${kept.sample.id}${pagePath}` : page.url;
+  const find = params.get("find");
+  const target = find ? { find, index: Number(params.get("index") ?? 0) } : null;
+  const out = viewHtml(html, { base, target, parse });
+  res.writeHead(200, VIEW_HEADERS);
+  return res.end(out.html);
+}
+
+/**
+ * The AI providers the local relay forwards to. Both speak the OpenAI chat/completions API.
+ * The default model is what a fresh setup uses; the owner can change it in the AI key screen.
+ */
+const PROVIDERS = {
+  meta: { name: "Meta Model API", route: "/byok/v1", upstream: META_ROUTER, env: "META_API_KEY", model: "muse-ember-1.0" },
+  // Google AI Studio's OpenAI-compatible endpoint. gemini-3.5-flash-lite answered with tool
+  // calls in 2-4 s on the free tier (2026-11-27); gemini-2.5-flash is closed to new users.
+  gemini: { name: "Google Gemini", route: "/byok/gemini/v1", upstream: "https://generativelanguage.googleapis.com/v1beta/openai", env: "GEMINI_API_KEY", model: "gemini-3.5-flash-lite" },
+};
+
+/**
+ * Local relay to an AI provider, so the assistant in a pack can call it from the browser
+ * without CORS trouble. The browser's key passes through in the Authorization header and
+ * is never logged or kept. With no key from the browser (or the "server" placeholder), the
+ * provider's key from .env is used. Only the two paths the runtime uses are forwarded.
+ */
+async function relay(req, res, providerId, sub) {
+  const provider = PROVIDERS[providerId];
+  if (!provider || !["chat/completions", "models"].includes(sub)) return notFound(res);
+  // Only pages on this server may use the relay (and the .env key), never another site.
+  const from = req.headers.origin;
+  if ((from && from !== `http://${req.headers.host}`) || req.headers["sec-fetch-site"] === "cross-site") {
+    return sendJson(res, 403, { error: { message: "The AI relay only answers pages on this server." } });
+  }
+  const given = req.headers.authorization ?? "";
+  // "server" is the placeholder key MythAgentic saves when the key lives in .env.
+  const auth = given && !/^Bearer\s*(demo|server)?\s*$/i.test(given)
+    ? given
+    : process.env[provider.env] ? `Bearer ${process.env[provider.env]}` : "";
+  if (!auth) return sendJson(res, 401, { error: { message: `No ${provider.name} key. Add one in MythAgentic's AI key screen, or put ${provider.env} in .env.` } });
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  let upstream;
+  try {
+    upstream = await fetch(`${provider.upstream}/${sub}`, {
+      method: req.method,
+      headers: { authorization: auth, "content-type": req.headers["content-type"] ?? "application/json", accept: req.headers.accept ?? "application/json" },
+      body: req.method === "POST" ? Buffer.concat(chunks) : undefined,
+      signal: AbortSignal.timeout(120_000),
+    });
+  } catch (error) {
+    return sendJson(res, 502, { error: { message: `Could not reach ${provider.name}: ${error.message}` } });
+  }
+  if (providerId === "gemini" && sub === "models" && upstream.ok) {
+    // Gemini lists "models/gemini-…" but chat takes "gemini-…". The runtime checks the
+    // chosen model against this list before a turn, so list the names chat accepts.
+    const list = await upstream.json().catch(() => ({ data: [] }));
+    for (const item of list.data ?? []) if (typeof item.id === "string") item.id = item.id.replace(/^models\//, "");
+    return sendJson(res, 200, list);
+  }
+  res.writeHead(upstream.status, { "content-type": upstream.headers.get("content-type") ?? "application/json", "cache-control": "no-store" });
+  if (!upstream.body) return res.end();
+  for await (const chunk of upstream.body) res.write(chunk);
+  return res.end();
+}
+
 let busy = false;
 
 const server = http.createServer(async (req, res) => {
-  const { pathname } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
+  const { pathname, searchParams } = new URL(req.url, `http://${req.headers.host ?? "localhost"}`);
   try {
+    const viewMatch = pathname.match(/^\/api\/view\/([a-z0-9]+)$/);
+    if (viewMatch && req.method === "GET") return view(res, viewMatch[1], searchParams);
+    const relayMatch = pathname.match(/^\/byok(?:\/(gemini))?\/v1\/(.+)$/);
+    if (relayMatch) return await relay(req, res, relayMatch[1] ?? "meta", relayMatch[2]);
+    if (pathname === "/api/ai-status" && req.method === "GET") {
+      // Which providers have a key in .env. Never the key itself.
+      const providers = Object.fromEntries(Object.entries(PROVIDERS).map(([id, p]) => [id, { name: p.name, router: p.route, model: p.model, serverKey: !!process.env[p.env] }]));
+      return sendJson(res, 200, { providers });
+    }
     if (pathname === "/api/samples" && req.method === "GET") return sendJson(res, 200, SAMPLES.map((s) => ({ ...s, preview: `/samples/${s.id}/`, cover: `/samples/${s.id}/${s.cover}` })));
     if ((pathname === "/api/scan" || pathname === "/api/pack") && req.method === "POST") {
       if (busy) return sendJson(res, 429, { error: "Another scan or build is running. Try again in a moment." });
